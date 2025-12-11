@@ -15,7 +15,7 @@ async function getProducts() {
         const collections = await res.json();
         return collections.map((item: any) => ({
             id: item.product_id,
-            category: item.licence.licence_name,
+            category: item.licence?.licence_name || "General",
             name: item.product_name,
             price: `$ ${item.price}`,
             imageFront: item.image_front,

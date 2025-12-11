@@ -1,8 +1,12 @@
-import Link from "next/link";
-import Image from "next/image";
+"use client";
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface ProductCardProps {
-    id: string; // or number
+    id: string | number;
     category: string;
     name: string;
     price: string;
@@ -13,12 +17,46 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ id, category, name, price, imageFront, imageBack, tag, installments }: ProductCardProps) {
+    const { token, user } = useAuth();
+    const router = useRouter();
+
+    const addToCart = async (e: React.MouseEvent) => {
+        e.preventDefault(); // Prevent link navigation
+        e.stopPropagation();
+
+        if (!user || !token) {
+            router.push("/login");
+            return;
+        }
+
+        try {
+            const res = await fetch("http://localhost:3000/shop/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ product_id: id, quantity: 1 })
+            });
+
+            if (res.ok) {
+                alert("Producto agregado al carrito!");
+            } else {
+                const data = await res.json();
+                alert(data.error || "Error al agregar al carrito");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error de conexión");
+        }
+    };
+
     return (
         <article className="w-full">
-            <Link href={`/shop/${id}`}>
+            <Link href={`/shop/${id}`} className="block relative group overflow-hidden">
                 <figure className="relative group overflow-hidden">
                     {tag && (
-                        <span className="absolute right-0 top-0 bg-primary text-white text-[1.4rem] font-medium uppercase px-[1.2rem] py-[0.8rem] z-10">
+                        <span className="absolute right-0 top-0 bg-primary text-white text-[1.4rem] font-medium uppercase px-[1.2rem] py-[0.8rem] z-10 text-[12px]">
                             {tag}
                         </span>
                     )}
@@ -46,11 +84,17 @@ export default function ProductCard({ id, category, name, price, imageFront, ima
                 </figure>
                 <div className="p-[1.6rem] flex flex-col gap-[1.2rem]">
                     <p className="text-[1.4rem] font-medium uppercase text-gray-500">{category}</p>
-                    <h4 className="text-[1.8rem] font-bold uppercase leading-tight">{name}</h4>
+                    <h4 className="text-[1.8rem] font-bold uppercase leading-tight line-clamp-2 min-h-[44px]">{name}</h4>
                     <p className="text-[1.6rem]">{price}</p>
                     {installments && (
                         <p className="text-[1.4rem] font-bold text-secondary uppercase whitespace-nowrap">{installments}</p>
                     )}
+                    <button
+                        onClick={addToCart}
+                        className="w-full bg-primary text-white font-bold text-[1.4rem] py-[1.2rem] rounded-[50px] mt-2 hover:bg-dark-bg transition-colors uppercase z-20 relative"
+                    >
+                        Agregar al Carrito
+                    </button>
                 </div>
             </Link>
         </article>

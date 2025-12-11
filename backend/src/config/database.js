@@ -1,12 +1,13 @@
 require('dotenv').config();
 
 module.exports = {
-    username: process.env.USER,
-    password: process.env.DBPASS,
-    database: process.env.DB,
-    host: process.env.HOST,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     dialect: 'mysql',
-    logging: false, // Turn off logging for cleaner output, or remove if you want logs
+    logging: false,
     define: {
         freezeTableName: true,
         timestamps: false

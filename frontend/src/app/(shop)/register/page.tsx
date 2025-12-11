@@ -1,6 +1,66 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Register() {
+    const router = useRouter();
+    const [formData, setFormData] = useState({
+        name: "",
+        lastname: "",
+        email: "",
+        password: "",
+        repPassword: ""
+    });
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+
+        if (formData.password !== formData.repPassword) {
+            setError("Las contraseñas no coinciden");
+            return;
+        }
+
+        try {
+            const payload = {
+                ...formData,
+                password_confirmation: formData.repPassword
+            };
+
+            const res = await fetch("http://localhost:3000/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.errors?.[0]?.msg || "Error al registrarse");
+                return;
+            }
+
+            setSuccess("Usuario registrado exitosamente. Redirigiendo a login...");
+            setTimeout(() => {
+                router.push("/login");
+            }, 2000);
+
+        } catch (err) {
+            setError("Error de conexión");
+        }
+    };
+
     return (
         <div className="container py-[8rem] flex justify-center items-center">
             <section className="w-full max-w-[600px] flex flex-col gap-[2.4rem]">
@@ -9,28 +69,31 @@ export default function Register() {
                     <p className="text-[1.8rem]">Completa el formulario para ser parte del mundo de los Funkos</p>
                 </div>
 
-                <form className="flex flex-col gap-[2rem]">
+                {error && <div className="bg-red-100 text-red-700 p-4 rounded">{error}</div>}
+                {success && <div className="bg-green-100 text-green-700 p-4 rounded">{success}</div>}
+
+                <form onSubmit={handleSubmit} className="flex flex-col gap-[2rem]">
                     <div className="grid grid-cols-[1fr_2fr] gap-[2rem] items-center">
                         <div className="flex flex-col gap-[2rem] text-right">
                             <label className="text-[1.8rem] font-medium" htmlFor="name">Nombre:</label>
-                            <label className="text-[1.8rem] font-medium" htmlFor="lastName">Apellido:</label>
+                            <label className="text-[1.8rem] font-medium" htmlFor="lastname">Apellido:</label>
                             <label className="text-[1.8rem] font-medium" htmlFor="email">Email:</label>
                             <label className="text-[1.8rem] font-medium" htmlFor="password">Contraseña:</label>
                             <label className="text-[1.8rem] font-medium" htmlFor="repPassword">Repita Contraseña:</label>
                         </div>
                         <div className="flex flex-col gap-[2rem]">
-                            <input name="nombre" id="name" type="text" placeholder="John" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
-                            <input name="apellido" id="lastName" type="text" placeholder="Doe" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
-                            <input name="email" id="email" type="email" placeholder="johndoe@correo.com" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
-                            <input name="contrasenia" id="password" type="password" placeholder="●●●●●●●●●●" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
-                            <input name="repContrasenia" id="repPassword" type="password" placeholder="●●●●●●●●●●" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
+                            <input name="name" id="name" type="text" placeholder="John" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" onChange={handleChange} />
+                            <input name="lastname" id="lastname" type="text" placeholder="Doe" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" onChange={handleChange} />
+                            <input name="email" id="email" type="email" placeholder="johndoe@correo.com" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" onChange={handleChange} />
+                            <input name="password" id="password" type="password" placeholder="●●●●●●●●●●" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" onChange={handleChange} />
+                            <input name="repPassword" id="repPassword" type="password" placeholder="●●●●●●●●●●" className="border-b-2 border-primary py-[0.4rem] text-[1.6rem] outline-none placeholder:text-gray-400" onChange={handleChange} />
                         </div>
                     </div>
 
                     <div className="flex flex-col items-center gap-[2rem] mt-[2rem]">
                         <button type="submit" className="bg-dark-bg text-white px-[3.2rem] py-[1.2rem] text-[1.6rem] font-medium hover:bg-primary-900 transition-colors uppercase">Registrar</button>
                         <div className="flex items-center gap-2">
-                            <input id="termAndCondi" name="termAndCondi" type="checkbox" className="size-5 accent-primary" />
+                            <input id="termAndCondi" name="termAndCondi" type="checkbox" className="size-5 accent-primary" required />
                             <label htmlFor="termAndCondi" className="text-[1.6rem]">Acepta <a href="#" className="text-secondary hover:underline">Terminos y Condiciones</a></label>
                         </div>
                     </div>

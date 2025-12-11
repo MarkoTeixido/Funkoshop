@@ -2,47 +2,65 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/conn');
 const bcryptjs = require("bcryptjs");
 
-// Set User Model
-const user = sequelize.define('user', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    lastname: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email:{
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-    password:{
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    create_time:{
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  name: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
+  lastname: {
+    type: DataTypes.STRING(100),
+    allowNull: false
+  },
+  email: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    unique: true
+  },
+  password: {
+    type: DataTypes.STRING(255),
+    allowNull: false
+  },
+  role: {
+    type: DataTypes.ENUM('user', 'admin'),
+    defaultValue: 'user',
+    allowNull: false
+  },
+  is_active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
+  },
+  email_verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  }
+}, {
+  tableName: 'user',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at'
 });
 
-user.beforeSave(async (user) => {
-  const { password } = user;
-
-  const hash = await bcryptjs.hash(password, 12);
-
-  user.password = hash;
+User.beforeCreate(async (user) => {
+  if (user.password) {
+    const hash = await bcryptjs.hash(user.password, 12);
+    user.password = hash;
+  }
 });
 
-(async () => {
-  await sequelize.sync();
-})();
+User.beforeUpdate(async (user) => {
+  if (user.changed('password')) {
+    const hash = await bcryptjs.hash(user.password, 12);
+    user.password = hash;
+  }
+});
 
-
-module.exports =  user ;
+module.exports = User;

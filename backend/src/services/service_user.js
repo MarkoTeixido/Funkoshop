@@ -26,9 +26,13 @@ async function createUser(userData) {
       lastname: userData.lastname,
       email: userData.email,
       password: userData.password,
-      create_time: new Date(),
+      role: userData.role || 'user', // Default to user, but allow admin if logic permits (e.g. seed)
+      phone: userData.phone
     });
-    return createdUser.toJSON();
+    // Remove password from returned object
+    const userJson = createdUser.toJSON();
+    delete userJson.password;
+    return userJson;
   } catch (error) {
     throw new Error(`Error al crear el usuario: ${error.message}`);
   }

@@ -1,46 +1,107 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProductSlider from "@/components/ProductSlider";
-
-const relatedProducts = [
-    { id: "1", category: "STAR WARS", name: "STORMTROOPER LIGHTSABER", price: "$ 1799,99", imageFront: "/images/star-wars/trooper-1.webp", imageBack: "/images/star-wars/trooper-box.webp", tag: "NUEVO", installments: "3 CUOTAS SIN INTERÉS" },
-    { id: "2", category: "POKEMON", name: "PIDGEOTTO", price: "$ 1799,99", imageFront: "/images/pokemon/pidgeotto-1.webp", imageBack: "/images/pokemon/pidgeotto-box.webp", tag: "NUEVO", installments: "3 CUOTAS SIN INTERÉS" },
-    { id: "3", category: "HARRY POTTER", name: "LUNA LOVEGOOD LION MASK", price: "$ 1799,99", imageFront: "/images/harry-potter/luna-1.webp", imageBack: "/images/harry-potter/luna-box.webp", tag: "NUEVO", installments: "3 CUOTAS SIN INTERÉS" },
-    { id: "1", category: "STAR WARS", name: "STORMTROOPER LIGHTSABER", price: "$ 1799,99", imageFront: "/images/star-wars/trooper-1.webp", imageBack: "/images/star-wars/trooper-box.webp", tag: "NUEVO", installments: "3 CUOTAS SIN INTERÉS" },
-    { id: "2", category: "POKEMON", name: "PIDGEOTTO", price: "$ 1799,99", imageFront: "/images/pokemon/pidgeotto-1.webp", imageBack: "/images/pokemon/pidgeotto-box.webp", tag: "NUEVO", installments: "3 CUOTAS SIN INTERÉS" },
-];
+import { useAuth } from "@/context/AuthContext";
+import { useParams, useRouter } from "next/navigation";
 
 export default function ProductDetail() {
-    const [quantity, setQuantity] = useState(0);
+    const { id } = useParams();
+    const { token, user } = useAuth();
+    const router = useRouter();
+    const [product, setProduct] = useState<any>(null);
+    const [related, setRelated] = useState<any[]>([]);
+    const [quantity, setQuantity] = useState(1);
+    const [loading, setLoading] = useState(true);
+
     const increment = () => setQuantity(prev => prev + 1);
-    const decrement = () => setQuantity(prev => (prev > 0 ? prev - 1 : 0));
+    const decrement = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                // Assuming route is /shop/item/:id based on shopRoutes
+                // If app.js mounts shopRoutes at /, then it's /item/:id
+                // But ProductCard uses /shop/item/:id in fetch.
+                // Let's assume /shop/item/:id for now or adjust based on app.js check
+                const res = await fetch(`http://localhost:3000/shop/item/${id}`);
+                const data = await res.json();
+                if (res.ok) {
+                    setProduct(data.product);
+                    setRelated(data.related.map((p: any) => ({
+                        id: p.product_id,
+                        category: p.licence?.licence_name || 'Category',
+                        name: p.product_name,
+                        price: `$ ${p.price}`,
+                        imageFront: p.image_front,
+                        imageBack: p.image_back,
+                        tag: p.is_featured ? "NUEVO" : "",
+                        installments: "3 CUOTAS SIN INTERÉS"
+                    })));
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        if (id) fetchProduct();
+    }, [id]);
+
+    const addToCart = async () => {
+        if (!user || !token) {
+            router.push("/login");
+            return;
+        }
+
+        try {
+            const res = await fetch("http://localhost:3000/shop/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ product_id: id, quantity: quantity })
+            });
+
+            if (res.ok) {
+                alert("Producto agregado al carrito!");
+            } else {
+                alert("Error al agregar al carrito");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error de conexión");
+        }
+    };
+
+    if (loading) return <div className="container py-[8rem] text-center text-[2rem]">Cargando...</div>;
+    if (!product) return <div className="container py-[8rem] text-center text-[2rem]">Producto no encontrado</div>;
 
     return (
         <main>
             <section className="container px-[2.4rem] min-[1000px]:px-[12rem] py-[6rem] text-dark">
                 <article className="flex flex-col md:flex-row items-center gap-[4rem] md:gap-[8rem]">
                     {/* Image */}
-                    <picture className="w-full max-w-[400px] md:max-w-1/2 flex justify-center">
+                    <picture className="w-full max-w-[400px] md:max-w-1/2 flex justify-center relative aspect-square">
                         <Image
-                            src="/images/star-wars/baby-yoda-1.webp"
-                            alt="Baby Yoda"
-                            width={500}
-                            height={500}
-                            className="w-full h-auto object-contain"
+                            src={product.image_front}
+                            alt={product.product_name}
+                            fill
+                            className="object-contain"
                             priority
                         />
                     </picture>
 
                     {/* Content */}
                     <div className="flex flex-col gap-[2rem] w-full max-w-[500px]">
-                        <p className="text-[1.6rem] font-medium uppercase text-gray-500">STAR WARS</p>
-                        <h3 className="text-[3.2rem] font-bold uppercase leading-tight font-raleway">BABY YODA BLUEBALL</h3>
+                        <p className="text-[1.6rem] font-medium uppercase text-gray-500">{product.licence?.licence_name}</p>
+                        <h3 className="text-[3.2rem] font-bold uppercase leading-tight font-raleway">{product.product_name}</h3>
                         <p className="text-[1.8rem] font-light">
-                            Figura coleccionable de Baby Yoda (Grogu) - The Mandalorian Saga, edición limitada.
+                            {product.product_description}
                         </p>
-                        <h3 className="text-[2.8rem] font-medium my-[1rem]">$ 1799,99</h3>
+                        <h3 className="text-[2.8rem] font-medium my-[1rem]">$ {product.price}</h3>
 
                         <div className="flex gap-[2rem] items-center">
                             <div className="flex items-center gap-0 w-[12rem] relative">
@@ -55,7 +116,7 @@ export default function ProductDetail() {
                                     <button onClick={decrement} className="text-[1.4rem] leading-none px-2 font-bold hover:text-primary transition-colors">-</button>
                                 </div>
                             </div>
-                            <button className="bg-dark-bg text-white px-[2.4rem] py-[0.8rem] text-[1.6rem] font-medium hover:bg-primary-900 transition-colors uppercase">
+                            <button onClick={addToCart} className="bg-dark-bg text-white px-[2.4rem] py-[0.8rem] text-[1.6rem] font-medium hover:bg-primary-900 transition-colors uppercase">
                                 Agregar al Carrito
                             </button>
                         </div>
@@ -69,7 +130,7 @@ export default function ProductDetail() {
             </section>
 
             {/* Slider */}
-            <ProductSlider title="PRODUCTOS RELACIONADOS" products={relatedProducts} />
+            <ProductSlider title="PRODUCTOS RELACIONADOS" products={related} />
         </main>
     );
 }
