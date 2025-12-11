@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #FF3333;
+  --color-primary-900: rgba(255, 51, 51, 0.9);
+  --color-primary-500: rgba(255, 51, 51, 0.5);
+  --color-primary-300: rgba(255, 51, 51, 0.3);
+
+  --color-secondary: #1D84B5;
+  --color-secondary-900: rgba(29, 132, 181, 0.9);
+  --color-secondary-500: rgba(29, 132, 181, 0.5);
+  --color-secondary-300: rgba(29, 132, 181, 0.3);
+
+  --color-dark: #1f1f1f;
+  --color-dark-900: rgba(31, 31, 31, 0.9);
+  --color-dark-500: rgba(31, 31, 31, 0.5);
+  --color-dark-300: rgba(31, 31, 31, 0.3);
+
+  --color-dark-bg: #30343F;
+  --color-light-bg: #FAFAFF;
+
+  --color-light-font: #FFFFFF;
+
+  --font-inter: var(--font-inter);
+  --font-raleway: var(--font-raleway);
+}
+
+:root {
+  /* Legacy Spacings (approximate re-mapping/usage not strictly needed if using arbitrary values, but good for ref) */
+  --spacing-128: 12.8rem;
+  --spacing-68: 6.8rem;
+  --spacing-36: 3.6rem;
+  --spacing-28: 2.8rem;
+  --spacing-24: 2.4rem;
+  --spacing-20: 2rem;
+  --spacing-16: 1.6rem;
+  --spacing-12: 1.2rem;
+  --spacing-8: 0.8rem;
+}
+
+html {
+  font-size: 62.5%;
+  /* 1rem = 10px */
+}
+
+body {
+  font-size: 1.6rem;
+  /* 16px default */
+  font-family: var(--font-inter);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Utilities equivalent to legacy useful.css */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0.4;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade {
+  animation: fade 0.4s ease-in-out;
+  /* Reduced time for better feel, legacy was 1.5s which is slow */
+}
