@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaBars, FaXmark, FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { FaBars, FaXmark, FaChevronDown, FaChevronUp, FaUser } from "react-icons/fa6";
+import { useAuth } from "@/context/AuthContext";
 
 interface HeaderProps {
     isAdmin?: boolean;
@@ -11,6 +12,8 @@ interface HeaderProps {
 export default function Header({ isAdmin = false }: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const { user, logout } = useAuth();
 
     // Lock scroll when menu is open
     useEffect(() => {
@@ -26,6 +29,7 @@ export default function Header({ isAdmin = false }: HeaderProps) {
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const toggleSubmenu = () => setIsSubmenuOpen(!isSubmenuOpen);
+    const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
 
     return (
         <header className="bg-dark-bg z-50 relative">
@@ -98,9 +102,49 @@ export default function Header({ isAdmin = false }: HeaderProps) {
                             <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
                                 <Link href="/contact" onClick={() => setIsMenuOpen(false)}>CONTACTO</Link>
                             </li>
-                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/login" onClick={() => setIsMenuOpen(false)}>LOGIN</Link>
-                            </li>
+
+                            {!user ? (
+                                <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
+                                    <Link href="/login" onClick={() => setIsMenuOpen(false)}>LOGIN</Link>
+                                </li>
+                            ) : (
+                                <li className="group relative hidden min-[1000px]:block">
+                                    <div className="cursor-pointer text-white hover:opacity-80 transition-opacity" onClick={toggleUserMenu}>
+                                        <FaUser size={24} />
+                                    </div>
+
+                                    {/* User Dropdown */}
+                                    <ul className={`
+                                        bg-dark-bg w-[180px] absolute top-[40px] right-0 z-50 flex flex-col shadow-lg rounded-b-lg border border-primary
+                                        ${isUserMenuOpen ? 'block' : 'hidden'}
+                                    `}>
+                                        <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left">
+                                            <Link href="/profile" onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}>Mi Perfil</Link>
+                                        </li>
+                                        <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left">
+                                            <Link href="/orders" onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}>Mis Pedidos</Link>
+                                        </li>
+                                        <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left cursor-pointer" onClick={() => { logout(); setIsUserMenuOpen(false); setIsMenuOpen(false); }}>
+                                            Cerrar Sesión
+                                        </li>
+                                    </ul>
+                                </li>
+                            )}
+
+                            {/* Mobile User Links (Visible only on mobile when logged in) */}
+                            {user && (
+                                <>
+                                    <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center">
+                                        <Link href="/profile" onClick={() => setIsMenuOpen(false)}>MI PERFIL</Link>
+                                    </li>
+                                    <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center">
+                                        <Link href="/orders" onClick={() => setIsMenuOpen(false)}>MIS PEDIDOS</Link>
+                                    </li>
+                                    <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center" onClick={() => { logout(); setIsMenuOpen(false); }}>
+                                        CERRAR SESIÓN
+                                    </li>
+                                </>
+                            )}
                             <li className="hidden min-[1000px]:block">
                                 <Link href="/cart">
                                     <div className="hover:opacity-80 transition-opacity">

@@ -19,4 +19,9 @@ const Cart = sequelize.define('Cart', {
     updatedAt: 'updated_at'
 });
 
+const CartItem = require('./model_cart_item');
+
+Cart.hasMany(CartItem, { foreignKey: 'cart_id' });
+CartItem.belongsTo(Cart, { foreignKey: 'cart_id' }); // Good practice to have both
+
 module.exports = Cart;

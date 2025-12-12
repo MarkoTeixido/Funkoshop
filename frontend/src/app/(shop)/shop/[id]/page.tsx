@@ -5,6 +5,7 @@ import Link from "next/link";
 import ProductSlider from "@/components/ProductSlider";
 import { useAuth } from "@/context/AuthContext";
 import { useParams, useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -66,13 +67,34 @@ export default function ProductDetail() {
             });
 
             if (res.ok) {
-                alert("Producto agregado al carrito!");
+                Swal.fire({
+                    title: '¡Producto agregado!',
+                    text: 'El producto se agregó al carrito correctamente.',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ff3333',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ir al carrito',
+                    cancelButtonText: 'Seguir comprando'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        router.push('/cart');
+                    }
+                });
             } else {
-                alert("Error al agregar al carrito");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al agregar al carrito'
+                });
             }
         } catch (err) {
             console.error(err);
-            alert("Error de conexión");
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error de conexión'
+            });
         }
     };
 

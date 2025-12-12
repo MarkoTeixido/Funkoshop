@@ -85,35 +85,8 @@ export default function Cart() {
         }
     };
 
-    const handleCheckout = async () => {
-        try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/shop/checkout`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                // Add dummy address data for now
-                body: JSON.stringify({
-                    street: "Calle 123",
-                    city: "Ciudad",
-                    state: "Provincia",
-                    zip: "1234",
-                    country: "Argentina",
-                    phone: "11111111"
-                })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert(`Orden creada con éxito! ID: ${data.orderId}`);
-                setCartItems([]);
-                router.push("/");
-            } else {
-                setError(data.error || "Error al procesar compra");
-            }
-        } catch (err) {
-            setError("Error de conexión");
-        }
+    const handleCheckout = () => {
+        router.push("/checkout");
     };
 
     const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.Product.price) * item.quantity), 0);

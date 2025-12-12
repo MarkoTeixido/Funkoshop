@@ -29,6 +29,21 @@ const shopControllers = {
     }
   },
 
+  // Orders Logic
+  getOrders: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const orders = await Order.findAll({
+        where: { user_id: userId },
+        include: [{ model: OrderItem }],
+        order: [['created_at', 'DESC']]
+      });
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
   // Cart Logic
   getCart: async (req, res) => {
     try {
@@ -137,6 +152,14 @@ const shopControllers = {
         totalAmount += parseFloat(item.Product.price) * item.quantity;
       });
 
+      // Verify Stock
+      for (const item of cart.CartItems) {
+        if (item.Product.stock < item.quantity) {
+          await transaction.rollback();
+          return res.status(400).json({ error: `No hay suficiente stock para ${item.Product.product_name}` });
+        }
+      }
+
       const order = await Order.create({
         order_number: `ORD-${Date.now()}`,
         user_id: userId,
@@ -149,10 +172,11 @@ const shopControllers = {
         shipping_country: req.body.country || 'USA',
         shipping_phone: req.body.phone || '555-5555',
         payment_method: 'credit_card',
-        status: 'pending'
+        status: 'processing' // Changed to processing (valid enum value)
       }, { transaction });
 
       for (const item of cart.CartItems) {
+        // Create Order Item
         await OrderItem.create({
           order_id: order.order_id,
           product_id: item.product_id,
@@ -162,6 +186,11 @@ const shopControllers = {
           unit_price: item.Product.price,
           subtotal: parseFloat(item.Product.price) * item.quantity
         }, { transaction });
+
+        // Deduct Stock
+        const productInstance = await product.findByPk(item.product_id, { transaction });
+        productInstance.stock -= item.quantity;
+        await productInstance.save({ transaction });
       }
 
       // Clear Cart

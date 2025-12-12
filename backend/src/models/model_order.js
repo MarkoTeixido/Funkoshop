@@ -79,4 +79,9 @@ const Order = sequelize.define('Order', {
     updatedAt: 'updated_at'
 });
 
+const OrderItem = require('./model_order_item');
+
+Order.hasMany(OrderItem, { foreignKey: 'order_id' });
+OrderItem.belongsTo(Order, { foreignKey: 'order_id' });
+
 module.exports = Order;
