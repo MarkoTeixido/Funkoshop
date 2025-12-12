@@ -4,9 +4,9 @@ const authControllers = require('../controllers/authControllers');
 const { registerValidations, loginValidations } = require('../utils/user_validations');
 const { verifyToken } = require('../middlewares/auth');
 
-router.get('/login', authControllers.loginView);
+// View routes removed for API-only backend
 router.post('/login', loginValidations, authControllers.loginUser);
-router.get('/register', authControllers.registerView);
+router.post('/login/admin', loginValidations, authControllers.loginAdmin);
 router.post('/register', registerValidations, authControllers.registerUser);
 router.post('/logout', authControllers.logoutView);
 router.get('/profile', verifyToken, authControllers.getProfile);

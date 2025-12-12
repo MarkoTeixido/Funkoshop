@@ -1,17 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const adminControllers = require('../controllers/adminControllers');
-const { verifyToken, isAdmin } = require('../middlewares/auth');
-const { productValidations } = require('../utils/product_validation');
+const { verifyToken, verifyAdmin } = require('../middlewares/auth');
 
-router.get('/products', verifyToken, isAdmin, adminControllers.index);
-router.post('/products/create', verifyToken, isAdmin, productValidations, adminControllers.create);
-router.put('/products/edit/:id', verifyToken, isAdmin, productValidations, adminControllers.update);
-router.delete('/products/delete/:id', verifyToken, isAdmin, adminControllers.delete);
+// Middleware to check for Admin Role
+// Assuming verifyToken adds user to req.user
+const checks = [verifyToken, (req, res, next) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Acceso denegado: Requiere rol de administrador.' });
+    }
+    next();
+}];
 
-const reportControllers = require('../controllers/reportControllers');
-
-router.get('/reports/sales', verifyToken, isAdmin, reportControllers.getSalesReport);
-router.get('/reports/orders', verifyToken, isAdmin, reportControllers.getOrderReport);
+router.get('/dashboard', checks, adminControllers.getDashboard);
+router.post('/products', checks, adminControllers.createProduct);
+router.get('/activity', checks, adminControllers.getActivity);
+router.get('/notifications', checks, adminControllers.getNotifications);
+router.get('/reports', checks, adminControllers.getReports);
 
 module.exports = router;

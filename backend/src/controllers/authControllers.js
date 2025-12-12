@@ -22,7 +22,8 @@ const authControllers = {
         where: { email: req.body.email },
       });
 
-      if (!user || !(await bcryptjs.compare(req.body.password, user.password))) {
+      // Strict check: Must exist, password match, AND BE USER ROLE
+      if (!user || !(await bcryptjs.compare(req.body.password, user.password)) || user.role === 'admin') {
         return res.status(401).json({
           errors: [{ msg: "Correo o contraseña incorrectos" }],
         });
@@ -36,7 +37,7 @@ const authControllers = {
       await RefreshToken.create({
         user_id: user.id,
         token: refreshToken,
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
       });
 
       return res.json({
@@ -44,12 +45,7 @@ const authControllers = {
         message: 'Login exitoso',
         accessToken,
         refreshToken,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-        }
+        user: { id: user.id, name: user.name, email: user.email, role: user.role }
       });
 
     } catch (error) {
@@ -57,7 +53,51 @@ const authControllers = {
       res.status(500).json({ error: error.message });
     }
   },
-  registerView: (req, res) => res.json({ message: "Register endpoint" }),
+  loginAdmin: async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: [{ msg: "Datos inválidos" }] });
+
+    try {
+      const user = await dataUser.findOne({ where: { email: req.body.email } });
+
+      console.log("--- Debug Admin Login ---");
+      console.log("Attempting login for:", req.body.email);
+      if (user) {
+        console.log("User found. Role:", user.role);
+        const isMatch = await bcryptjs.compare(req.body.password, user.password);
+        console.log("Password match:", isMatch);
+      } else {
+        console.log("User not found");
+      }
+
+      // Strict check: Must exist, match password, AND BE ADMIN ROLE
+      if (!user || !(await bcryptjs.compare(req.body.password, user.password)) || user.role !== 'admin') {
+        console.log("Login failed: Invalid credentials or role");
+        // Fail silently / generic error
+        return res.status(401).json({ errors: [{ msg: "Credenciales inválidas" }] });
+      }
+
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+
+      await RefreshToken.create({
+        user_id: user.id,
+        token: refreshToken,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      });
+
+      return res.json({
+        success: true,
+        message: 'Admin Login exitoso',
+        accessToken,
+        refreshToken,
+        user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  },
   registerUser: async (req, res) => {
     const errors = validationResult(req);
 

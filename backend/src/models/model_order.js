@@ -80,8 +80,10 @@ const Order = sequelize.define('Order', {
 });
 
 const OrderItem = require('./model_order_item');
+const User = require('./model_user');
 
 Order.hasMany(OrderItem, { foreignKey: 'order_id' });
 OrderItem.belongsTo(Order, { foreignKey: 'order_id' });
+Order.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = Order;
