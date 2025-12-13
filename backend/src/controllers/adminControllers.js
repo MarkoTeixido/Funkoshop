@@ -1,4 +1,5 @@
 const { product } = require('../models/model_product');
+const { category } = require('../models/model_category');
 const User = require('../models/model_user');
 const Order = require('../models/model_order');
 const { sequelize } = require('../config/conn');
@@ -7,7 +8,10 @@ const adminControllers = {
     // Dashboard: Get Products List (Mocking CRUD for now, can be expanded)
     getDashboard: async (req, res) => {
         try {
-            const products = await product.findAll();
+            const products = await product.findAll({
+                include: { model: category, attributes: ['category_name'] }
+            });
+            console.log("Admin Dashboard Products:", JSON.stringify(products[0], null, 2)); // Log first item
             res.json(products);
         } catch (error) {
             res.status(500).json({ error: error.message });

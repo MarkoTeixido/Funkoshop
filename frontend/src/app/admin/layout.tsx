@@ -46,7 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Header isAdmin={true} notificationCount={notifications} />
 
             {/* Main Content */}
-            <main className="flex-1 min-h-[calc(100vh-400px)] container mx-auto px-6 py-12">
+            <main className="flex-1 min-h-[calc(100vh-400px)] standard-container py-12">
                 {children}
             </main>
 

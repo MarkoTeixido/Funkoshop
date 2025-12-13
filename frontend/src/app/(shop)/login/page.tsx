@@ -35,7 +35,7 @@ export default function Login() {
     };
 
     return (
-        <div className="container py-[8rem] flex justify-center items-center">
+        <div className="standard-container py-[8rem] flex justify-center items-center">
             <form onSubmit={handleSubmit} className="w-full max-w-[500px] flex flex-col gap-[2.4rem]">
                 <h2 className="text-[3.8rem] font-bold text-center uppercase font-raleway mb-[2rem]">Ingresar a mi cuenta</h2>
 

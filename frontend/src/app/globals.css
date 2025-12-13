@@ -53,6 +53,27 @@ body {
 }
 
 /* Utilities equivalent to legacy useful.css */
+/* Updated to include responsive padding matching the Header */
+.standard-container {
+  max-width: 1440px;
+  /* Or 100% depending on desire, usually Header is open but padded */
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 2.4rem;
+  /* px-[2.4rem] */
+  padding-right: 2.4rem;
+  /* px-[2.4rem] */
+}
+
+@media (min-width: 1000px) {
+  .standard-container {
+    padding-left: 12.8rem;
+    /* min-[1000px]:px-[12.8rem] */
+    padding-right: 12.8rem;
+    /* min-[1000px]:px-[12.8rem] */
+  }
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;

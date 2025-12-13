@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import ProductSlider from "@/components/ProductSlider";
 import ProductCard from "@/components/ProductCard";
 
 const fallbackProducts = [
@@ -34,10 +35,10 @@ export default async function Home() {
     return (
         <>
             {/* Hero */}
-            <section className="relative w-full bg-[url('/images/funkos-banner.webp')] bg-cover bg-top bg-fixed bg-no-repeat py-[6.8rem] min-[1000px]:py-[12.8rem]
+            <section className="relative w-full bg-[url('https://res.cloudinary.com/dp7jr9k94/image/upload/v1765590900/funkos-banner_pfrmdp.webp')] bg-cover bg-top bg-fixed bg-no-repeat py-[6.8rem] min-[1000px]:py-[12.8rem]
                 before:content-[''] before:absolute before:inset-0 before:bg-black/50 before:backdrop-blur-[2px] z-0"
             >
-                <div className="container relative z-10 px-[2.4rem] min-[1000px]:px-[12.8rem] flex flex-col gap-[2rem] items-center min-[1000px]:items-start text-center min-[1000px]:text-left">
+                <div className="standard-container relative z-10 flex flex-col gap-[2rem] items-center min-[1000px]:items-start text-center min-[1000px]:text-left">
                     <h3 className="font-raleway text-[3rem] min-[1000px]:text-[3.8rem] font-bold text-white uppercase leading-tight drop-shadow-md">
                         Nuevos<br />Ingresos
                     </h3>
@@ -51,7 +52,7 @@ export default async function Home() {
             </section>
 
             {/* Collections */}
-            <section className="container py-[4rem] px-[2.4rem] min-[1000px]:px-[12.8rem] text-dark">
+            <section className="standard-container py-[4rem] text-dark">
                 {/* Collection 1 */}
                 <article className="grid grid-cols-1 min-[1000px]:grid-cols-2 items-center gap-[2rem] mb-[4rem]">
                     <div className="flex flex-col gap-[2.4rem] items-center min-[1000px]:items-start text-center min-[1000px]:text-left order-2 min-[1000px]:order-1">
@@ -108,13 +109,9 @@ export default async function Home() {
             </section>
 
             {/* Latest Releases */}
-            <section className="container py-[4rem] px-[2.4rem] min-[1000px]:px-[12.8rem] text-dark">
+            <section className="container py-[4rem] standard-container text-dark">
                 <h2 className="text-[3.2rem] font-bold text-center uppercase mb-[4rem]">Últimos Lanzamientos</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[2.4rem]">
-                    {products.map((p: any) => (
-                        <ProductCard key={p.id} {...p} />
-                    ))}
-                </div>
+                <ProductSlider products={products} />
             </section>
         </>
     )

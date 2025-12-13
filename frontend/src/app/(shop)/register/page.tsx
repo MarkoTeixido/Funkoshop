@@ -62,7 +62,7 @@ export default function Register() {
     };
 
     return (
-        <div className="container py-[8rem] flex justify-center items-center">
+        <div className="standard-container py-[8rem] flex justify-center items-center">
             <section className="w-full max-w-[600px] flex flex-col gap-[2.4rem]">
                 <div className="text-center space-y-2">
                     <h2 className="text-[3.8rem] font-bold uppercase font-raleway text-dark">CREA TU CUENTA</h2>

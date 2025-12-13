@@ -7,8 +7,8 @@ interface FooterProps {
 
 export default function Footer({ isAdmin = false }: FooterProps) {
     return (
-        <footer className={`bg-dark-bg ${isAdmin ? 'py-[1.8rem]' : 'py-[3.6rem]'} px-[2.4rem] md:px-[6.8rem] lg:px-[12.8rem] text-light-font`}>
-            <nav className={`container max-w-[1150px] mx-auto flex flex-col md:flex-row ${isAdmin ? 'justify-center' : 'justify-between'} items-center`}>
+        <footer className={`bg-dark-bg ${isAdmin ? 'py-[1.8rem]' : 'py-[3.6rem]'} text-light-font w-full`}>
+            <nav className={`standard-container mx-auto flex flex-col md:flex-row ${isAdmin ? 'justify-center' : 'justify-between'} items-center`}>
                 {!isAdmin && (
                     <ul className="flex flex-col md:flex-row items-center gap-[2rem] md:gap-[1rem]">
                         <li className="font-medium text-[2rem] md:text-[1.8rem]">
@@ -24,7 +24,7 @@ export default function Footer({ isAdmin = false }: FooterProps) {
                 )}
                 <picture className="p-[0.8rem] md:p-[2rem] max-w-[120px] md:max-w-none">
                     <Image
-                        src="/images/branding/isotype.svg"
+                        src="https://res.cloudinary.com/dp7jr9k94/image/upload/v1765590925/isotype_jca7v6.svg"
                         alt="Isotipo de Funkoshop"
                         width={80}
                         height={80}

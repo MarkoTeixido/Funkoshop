@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 export default function AdminDashboard() {
     const { token } = useAuth();
     const [products, setProducts] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -75,13 +76,15 @@ export default function AdminDashboard() {
                     className="w-full border-2 border-primary rounded-[50px] px-[1.6rem] py-[0.8rem] text-[1.6rem] placeholder:text-gray-400 focus:outline-none"
                     type="text"
                     placeholder="código, nombre o categoria"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
 
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-[2rem] gap-4">
                 <h1 className="text-[3.2rem] font-bold uppercase text-dark">LISTADO DE PRODUCTOS</h1>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 pr-4">
                     <span className="text-[1.8rem] font-bold text-primary uppercase">AGREGAR</span>
                     <Link href="/admin/products/create" className="bg-primary text-white p-3 rounded-[10px] hover:bg-primary-900 transition-colors">
                         <FaPlus size={24} />
@@ -95,19 +98,25 @@ export default function AdminDashboard() {
                     <thead>
                         <tr>
                             <th className="py-4 font-bold uppercase text-dark w-[5%]">ID</th>
-                            <th className="py-4 font-bold uppercase text-dark w-[15%]">Código</th>
-                            <th className="py-4 font-bold uppercase text-dark w-[40%]">Nombre del Producto</th>
+                            <th className="py-4 font-bold uppercase text-dark w-[10%]">Código</th>
+                            <th className="py-4 font-bold uppercase text-dark w-[35%]">Nombre del Producto</th>
                             <th className="py-4 font-bold uppercase text-dark w-[25%]">Categoria</th>
-                            <th className="py-4 w-[15%]"></th>
+                            <th className="py-4 font-bold uppercase text-dark w-[15%]">Stock</th>
+                            <th className="py-4 w-[10%]"></th>
                         </tr>
                     </thead>
                     <tbody className="font-medium text-[1.4rem]">
-                        {products.map((p) => (
+                        {products.filter(p =>
+                            p.product_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            p.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            (p.Category?.category_name || '').toLowerCase().includes(searchTerm.toLowerCase())
+                        ).map((p) => (
                             <tr key={p.product_id} className="border-t border-gray-300">
                                 <td className="py-4">#{p.product_id}</td>
                                 <td className="py-4">{p.sku}</td>
                                 <td className="py-4">{p.product_name}</td>
-                                <td className="py-4">{p.category_name || 'N/A'}</td>
+                                <td className="py-4">{p.Category?.category_name || 'N/A'}</td>
+                                <td className="py-4">{p.stock}</td>
                                 <td className="py-4 flex gap-4">
                                     <Link href={`/admin/products/${p.product_id}/edit`} className="hover:opacity-80">
                                         <Image src="/images/icons/edit_pencil.svg" alt="Edit" width={24} height={24} />

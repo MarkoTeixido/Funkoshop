@@ -62,7 +62,7 @@ export default function Shop() {
     };
 
     return (
-        <div className="container px-[2.4rem] py-[4rem] flex flex-col md:flex-row gap-[4rem] text-dark">
+        <div className="standard-container py-[4rem] flex flex-col md:flex-row gap-[4rem] text-dark">
             <aside className="w-full md:w-[250px] shrink-0 space-y-[4rem]">
                 {/* Search */}
                 <div className="space-y-[1.2rem]">

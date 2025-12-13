@@ -102,8 +102,8 @@ export default function Cart() {
     );
 
     return (
-        <div className="container py-[8rem] text-dark relative">
-            <section className="flex flex-col gap-[4rem] px-[2.4rem] min-[1000px]:px-[12rem] mb-[4rem]">
+        <div className="standard-container py-[8rem] text-dark relative">
+            <section className="flex flex-col gap-[4rem] mb-[4rem]">
                 <h1 className="text-[3.8rem] font-bold uppercase border-b-[4px] border-primary pb-[1.2rem] w-full max-w-[600px]">CARRITO DE COMPRAS</h1>
 
                 {error && <div className="bg-red-100 text-red-700 p-4 rounded text-[1.6rem]">{error}</div>}
@@ -155,7 +155,7 @@ export default function Cart() {
             </section>
 
             {cartItems.length > 0 && (
-                <section className="flex flex-col gap-[4rem] px-[2.4rem] min-[1000px]:px-[12rem] items-end">
+                <section className="flex flex-col gap-[4rem] items-end">
                     <h2 className="text-[3.8rem] font-bold uppercase border-b-[4px] border-primary pb-[1.2rem] w-full max-w-[600px] text-right">RESUMEN</h2>
                     <div className="bg-light-bg rounded-[10px] w-full max-w-[600px] shadow-md">
                         <div className="p-[2rem] flex justify-between items-center text-[1.8rem] border-b border-gray-300">
