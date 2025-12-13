@@ -2,14 +2,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaBars, FaXmark, FaChevronDown, FaChevronUp, FaUser } from "react-icons/fa6";
+import { FaBars, FaXmark, FaChevronDown, FaChevronUp, FaUser, FaRegBell } from "react-icons/fa6";
 import { useAuth } from "@/context/AuthContext";
 
 interface HeaderProps {
     isAdmin?: boolean;
+    notificationCount?: number;
 }
 
-export default function Header({ isAdmin = false }: HeaderProps) {
+export default function Header({ isAdmin = false, notificationCount = 0 }: HeaderProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -65,13 +66,27 @@ export default function Header({ isAdmin = false }: HeaderProps) {
                         /* Admin Menu */
                         <>
                             <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/shop" onClick={() => setIsMenuOpen(false)}>VER TIENDA</Link>
+                                <Link href="/admin/dashboard" onClick={() => setIsMenuOpen(false)}>PRODUCTOS</Link>
                             </li>
                             <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/admin" onClick={() => setIsMenuOpen(false)}>ADMIN</Link>
+                                <Link href="/admin/activity" onClick={() => setIsMenuOpen(false)}>ACTIVIDAD</Link>
                             </li>
                             <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/" onClick={() => setIsMenuOpen(false)}>SALIR</Link>
+                                <Link href="/admin/reports" onClick={() => setIsMenuOpen(false)}>REPORTES</Link>
+                            </li>
+                            {/* Notification Bell */}
+                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto flex justify-center items-center">
+                                <div className="relative cursor-pointer" title="Notificaciones de Stock">
+                                    <FaRegBell size={24} />
+                                    {notificationCount > 0 && (
+                                        <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[1rem] w-[1.6rem] h-[1.6rem] flex items-center justify-center rounded-full font-bold">
+                                            {notificationCount}
+                                        </span>
+                                    )}
+                                </div>
+                            </li>
+                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
+                                <button onClick={() => { logout(); setIsMenuOpen(false); }} className="uppercase">SALIR</button>
                             </li>
                         </>
                     ) : (

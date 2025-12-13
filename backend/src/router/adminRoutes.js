@@ -17,5 +17,8 @@ router.post('/products', checks, adminControllers.createProduct);
 router.get('/activity', checks, adminControllers.getActivity);
 router.get('/notifications', checks, adminControllers.getNotifications);
 router.get('/reports', checks, adminControllers.getReports);
+router.get('/products/:id', checks, adminControllers.getProductById);
+router.put('/products/:id', checks, adminControllers.editProduct);
+router.delete('/products/:id', checks, adminControllers.deleteProduct);
 
 module.exports = router;

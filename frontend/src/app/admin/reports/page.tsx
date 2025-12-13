@@ -26,11 +26,11 @@ export default function AdminReports() {
     };
 
     return (
-        <div>
-            <h2 className="text-3xl font-bold uppercase text-gray-800 mb-8">Reportes y Estadísticas</h2>
+        <div className="text-dark">
+            <h2 className="text-[3.2rem] font-bold uppercase mb-8">Reportes y Estadísticas</h2>
 
-            <div className="bg-white p-8 rounded-lg shadow-md">
-                <h3 className="text-xl font-bold mb-6 border-b pb-4 text-gray-600">Descargar Reportes de Ventas</h3>
+            <div className="bg-white p-8 rounded-[10px] shadow-sm border border-gray-200">
+                <h3 className="text-[2rem] font-bold mb-6 border-b pb-4 text-gray-600">Descargar Reportes de Ventas</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <ReportCard title="Último Día" icon={<FaCalendar />} onClick={() => handleDownload('day')} />
@@ -45,12 +45,12 @@ export default function AdminReports() {
 
 function ReportCard({ title, icon, onClick }: { title: string, icon: React.ReactNode, onClick: () => void }) {
     return (
-        <div onClick={onClick} className="border border-gray-200 p-6 rounded-lg hover:shadow-lg transition-all cursor-pointer flex flex-col items-center gap-4 group hover:bg-gray-50 bg-white">
-            <div className="text-4xl text-primary group-hover:scale-110 transition-transform">
+        <div onClick={onClick} className="border border-gray-200 p-6 rounded-[10px] hover:shadow-lg transition-all cursor-pointer flex flex-col items-center gap-4 group hover:bg-gray-50 bg-white">
+            <div className="text-[3.2rem] text-primary group-hover:scale-110 transition-transform">
                 {icon}
             </div>
-            <p className="font-bold text-gray-700 uppercase">{title}</p>
-            <span className="text-xs text-blue-500 font-medium flex items-center gap-1">
+            <p className="font-bold text-[1.6rem] text-dark uppercase">{title}</p>
+            <span className="text-[1.2rem] text-blue-500 font-medium flex items-center gap-1">
                 <FaFileCsv /> CSV / JSON
             </span>
         </div>

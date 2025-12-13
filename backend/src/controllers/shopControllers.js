@@ -1,4 +1,7 @@
 const { product } = require('../models/model_product');
+const { category } = require('../models/model_category');
+const { licence } = require('../models/model_licence');
+const { Op } = require('sequelize');
 const Cart = require('../models/model_cart');
 const CartItem = require('../models/model_cart_item');
 const Order = require('../models/model_order');
@@ -9,9 +12,56 @@ const { sequelize } = require('../config/conn');
 const shopControllers = {
   shopView: async (req, res) => {
     try {
-      const collections = await product.findAll({ where: { is_active: true } });
+      const { search, min, max, sort, offers, special } = req.query;
+      const isNew = req.query.new; // 'new' is a reserved word in some contexts
+      const whereClause = { is_active: true };
+
+      if (search) {
+        whereClause[Op.or] = [
+          { product_name: { [Op.like]: `%${search}%` } },
+          { '$Category.category_name$': { [Op.like]: `%${search}%` } },
+          { '$Licence.licence_name$': { [Op.like]: `%${search}%` } }
+        ];
+      }
+
+      if (min || max) {
+        whereClause.price = {};
+        if (min) whereClause.price[Op.gte] = min;
+        if (max) whereClause.price[Op.lte] = max;
+      }
+
+      // Sidebar Filters
+      if (offers === 'true') {
+        whereClause.discount = { [Op.gt]: 0 };
+      }
+
+      if (special === 'true') {
+        whereClause.is_featured = true;
+      }
+
+      if (isNew === 'true') {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        whereClause.created_at = { [Op.gte]: thirtyDaysAgo };
+      }
+
+      let orderClause = [['created_at', 'DESC']];
+      if (sort === 'price-ascending') orderClause = [['price', 'ASC']];
+      if (sort === 'price-descending') orderClause = [['price', 'DESC']];
+      if (sort === 'alpha-ascending') orderClause = [['product_name', 'ASC']];
+      if (sort === 'alpha-descending') orderClause = [['product_name', 'DESC']];
+
+      const collections = await product.findAll({
+        where: whereClause,
+        include: [
+          { model: category },
+          { model: licence }
+        ],
+        order: orderClause
+      });
       res.json(collections);
     } catch (error) {
+      console.error(error);
       res.status(500).json({ error: error.message });
     }
   },

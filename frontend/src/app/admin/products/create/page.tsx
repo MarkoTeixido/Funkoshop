@@ -18,7 +18,9 @@ export default function CreateProduct() {
         price: '',
         stock: '',
         discount: '',
-        dues: ''
+        dues: '',
+        image_front: '',
+        image_back: ''
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -52,72 +54,103 @@ export default function CreateProduct() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-4 mb-8">
+        <div className="container py-[4rem] text-dark px-[2.4rem] min-[1000px]:px-[12rem]">
+            {/* Header/Back */}
+            <div className="flex items-center gap-4 mb-[4rem]">
                 <Link href="/admin/dashboard" className="text-gray-500 hover:text-dark-bg">
                     <FaArrowLeft size={24} />
                 </Link>
-                <h2 className="text-3xl font-bold uppercase text-gray-800">Crear Nuevo Producto</h2>
+                <h1 className="text-[3.2rem] font-bold uppercase">CREAR NUEVO ITEM</h1>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="block font-bold mb-2">Categoría</label>
-                        <select name="category" onChange={handleChange} className="w-full border p-3 rounded bg-gray-50">
+            <form onSubmit={handleSubmit} className="max-w-[1000px] flex flex-col gap-[4rem]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-[4rem]">
+                    {/* Category */}
+                    <div className="flex flex-col gap-[1rem]">
+                        <label className="text-[1.8rem] font-medium" htmlFor="category">Categoria:</label>
+                        <select id="category" name="category" onChange={handleChange} className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] bg-white outline-none cursor-pointer">
                             <option value="">Seleccionar</option>
                             <option value="1">Figuras</option>
                             <option value="2">Remeras</option>
                         </select>
                     </div>
-                    <div>
-                        <label className="block font-bold mb-2">Licencia</label>
-                        <select name="licence" onChange={handleChange} className="w-full border p-3 rounded bg-gray-50">
+                    {/* License */}
+                    <div className="flex flex-col gap-[1rem]">
+                        <label className="text-[1.8rem] font-medium" htmlFor="licence">Licencia:</label>
+                        <select id="licence" name="licence" onChange={handleChange} className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] bg-white outline-none cursor-pointer">
                             <option value="">Seleccionar</option>
                             <option value="1">Star Wars</option>
                             <option value="2">Pokemon</option>
+                            <option value="3">Harry Potter</option>
                         </select>
                     </div>
                 </div>
 
-                <div>
-                    <label className="block font-bold mb-2">Nombre del Producto</label>
-                    <input type="text" name="product_name" onChange={handleChange} className="w-full border p-3 rounded" placeholder="Ej. Baby Yoda" required />
+                {/* Name */}
+                <div className="flex flex-col gap-[1rem]">
+                    <label className="text-[1.8rem] font-medium" htmlFor="product_name">Nombre del producto:</label>
+                    <input type="text" name="product_name" id="product_name" onChange={handleChange} placeholder="Kakashi Hatake Shippuden Saga" className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
                 </div>
 
-                <div>
-                    <label className="block font-bold mb-2">Descripción</label>
-                    <textarea name="product_description" onChange={handleChange} className="w-full border p-3 rounded h-32" placeholder="Descripción del producto..."></textarea>
+                {/* Description */}
+                <div className="flex flex-col gap-[1rem]">
+                    <label className="text-[1.8rem] font-medium" htmlFor="product_description">Descripción:</label>
+                    <textarea name="product_description" id="product_description" onChange={handleChange} placeholder="Descripcion del producto" rows={10} className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400 resize-none"></textarea>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label className="block font-bold mb-2">SKU</label>
-                        <input type="text" name="sku" onChange={handleChange} className="w-full border p-3 rounded" placeholder="Ej. SW-123" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-[4rem]">
+                    {/* SKU */}
+                    <div className="flex flex-col gap-[1rem]">
+                        <label className="text-[1.8rem] font-medium" htmlFor="sku">SKU:</label>
+                        <input id="sku" name="sku" type="text" onChange={handleChange} placeholder="SSK111AB001" className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
                     </div>
-                    <div>
-                        <label className="block font-bold mb-2">Precio</label>
-                        <input type="number" name="price" onChange={handleChange} className="w-full border p-3 rounded" placeholder="0.00" />
+                    {/* Price */}
+                    <div className="flex flex-col gap-[1rem]">
+                        <label className="text-[1.8rem] font-medium" htmlFor="price">Precio:</label>
+                        <input id="price" name="price" type="number" onChange={handleChange} placeholder="0.00" className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
                     </div>
-                    <div>
-                        <label className="block font-bold mb-2">Stock</label>
-                        <input type="number" name="stock" onChange={handleChange} className="w-full border p-3 rounded" placeholder="0" />
-                    </div>
-                </div>
-
-                <div>
-                    <label className="block font-bold mb-2">Imágenes (Front/Back)</label>
-                    <div className="border-2 border-dashed border-gray-300 p-8 text-center rounded bg-gray-50">
-                        <p className="text-gray-500">Funcionalidad de carga de imágenes pendiente de implementación</p>
+                    {/* Stock */}
+                    <div className="flex flex-col gap-[1rem]">
+                        <label className="text-[1.8rem] font-medium" htmlFor="stock">Stock:</label>
+                        <input id="stock" name="stock" type="number" onChange={handleChange} placeholder="0" className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
                     </div>
                 </div>
 
-                <div className="flex gap-4 pt-4">
-                    <button type="submit" className="bg-primary text-white px-8 py-3 rounded font-bold hover:bg-dark-bg transition-colors uppercase">Agregar Producto</button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-[4rem]">
+                    {/* Discount */}
+                    <div className="flex flex-col gap-[1rem]">
+                        <label className="text-[1.8rem] font-medium" htmlFor="discount">Descuento:</label>
+                        <input id="discount" name="discount" type="number" onChange={handleChange} placeholder="0%" className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
+                    </div>
+                    {/* Installments (Cuotas) */}
+                    <div className="flex flex-col gap-[1rem]">
+                        <label className="text-[1.8rem] font-medium" htmlFor="dues">Cuotas:</label>
+                        <select id="dues" name="dues" onChange={handleChange} className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] bg-white outline-none cursor-pointer">
+                            <option value="">Seleccionar</option>
+                            <option value="3">3 Cuotas sin interes</option>
+                            <option value="6">6 Cuotas sin interes</option>
+                            <option value="12">12 Cuotas sin interes</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Images */}
+                <div className="flex flex-col gap-[1rem]">
+                    <label className="text-[1.8rem] font-medium" htmlFor="image_front">URL Imagen Frente:</label>
+                    <input type="text" name="image_front" id="image_front" onChange={handleChange} placeholder="https://..." className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
+                </div>
+                <div className="flex flex-col gap-[1rem]">
+                    <label className="text-[1.8rem] font-medium" htmlFor="image_back">URL Imagen Dorso:</label>
+                    <input type="text" name="image_back" id="image_back" onChange={handleChange} placeholder="https://..." className="border border-dark rounded-[10px] px-[1.6rem] py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400" />
+                </div>
+
+                <div className="flex gap-[2rem] mt-[2rem]">
+                    <button type="submit" className="bg-primary text-white px-[3.2rem] py-[1.2rem] text-[1.6rem] font-medium hover:bg-primary-900 transition-colors uppercase">Agregar Producto</button>
                     <button type="button" onClick={() => setFormData({
                         category: '', licence: '', product_name: '', product_description: '',
-                        sku: '', price: '', stock: '', discount: '', dues: ''
-                    })} className="bg-gray-200 text-gray-700 px-6 py-3 rounded font-bold hover:bg-gray-300 transition-colors uppercase">Limpiar</button>
+                        sku: '', price: '', stock: '', discount: '', dues: '',
+                        image_front: '', image_back: ''
+                    })} className="bg-dark-bg text-white px-[3.2rem] py-[1.2rem] text-[1.6rem] font-medium hover:bg-gray-700 transition-colors uppercase">Limpiar</button>
                 </div>
             </form>
         </div>

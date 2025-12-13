@@ -15,9 +15,10 @@ interface ProductCardProps {
     imageBack: string;
     tag?: string;
     installments?: string;
+    stock: number;
 }
 
-export default function ProductCard({ id, category, name, price, imageFront, imageBack, tag, installments }: ProductCardProps) {
+export default function ProductCard({ id, category, name, price, imageFront, imageBack, tag, installments, stock }: ProductCardProps) {
     const { token, user } = useAuth();
     const router = useRouter();
 
@@ -111,12 +112,21 @@ export default function ProductCard({ id, category, name, price, imageFront, ima
                     {installments && (
                         <p className="text-[1.4rem] font-bold text-secondary uppercase whitespace-nowrap">{installments}</p>
                     )}
-                    <button
-                        onClick={addToCart}
-                        className="w-full bg-primary text-white font-bold text-[1.4rem] py-[1.2rem] rounded-[50px] mt-2 hover:bg-dark-bg transition-colors uppercase z-20 relative"
-                    >
-                        Agregar al Carrito
-                    </button>
+                    {stock === 0 ? (
+                        <button
+                            disabled
+                            className="w-full bg-gray-400 text-white font-bold text-[1.4rem] py-[1.2rem] rounded-[50px] mt-2 cursor-not-allowed uppercase z-20 relative"
+                        >
+                            Sin Stock
+                        </button>
+                    ) : (
+                        <button
+                            onClick={addToCart}
+                            className="w-full bg-primary text-white font-bold text-[1.4rem] py-[1.2rem] rounded-[50px] mt-2 hover:bg-dark-bg transition-colors uppercase z-20 relative"
+                        >
+                            Agregar al Carrito
+                        </button>
+                    )}
                 </div>
             </Link>
         </article>

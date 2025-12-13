@@ -26,44 +26,44 @@ export default function AdminActivity() {
         }
     };
 
-    if (loading) return <div className="text-center py-10">Cargando actividad...</div>;
-    if (!stats) return <div className="text-center py-10">No hay datos disponibles</div>;
+    if (loading) return <div className="text-center py-10 text-[1.6rem]">Cargando actividad...</div>;
+    if (!stats) return <div className="text-center py-10 text-[1.6rem]">No hay datos disponibles</div>;
 
     return (
-        <div>
-            <h2 className="text-3xl font-bold uppercase text-gray-800 mb-8">Panel de Actividad</h2>
+        <div className="text-dark">
+            <h2 className="text-[3.2rem] font-bold uppercase mb-8">Panel de Actividad</h2>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500 flex items-center justify-between">
+                <div className="bg-white p-6 rounded-[10px] shadow-sm border border-gray-200 flex items-center justify-between">
                     <div>
-                        <p className="text-gray-500 font-bold uppercase text-sm mb-1">Pedidos Pendientes</p>
-                        <p className="text-4xl font-bold text-gray-800">{stats.pendingOrders}</p>
+                        <p className="text-gray-500 font-bold uppercase text-[1.4rem] mb-1">Pedidos Pendientes</p>
+                        <p className="text-[3.2rem] font-bold text-dark">{stats.pendingOrders}</p>
                     </div>
-                    <FaClock className="text-4xl text-yellow-500 opacity-50" />
+                    <FaClock className="text-[4rem] text-yellow-500 opacity-50" />
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 flex items-center justify-between">
+                <div className="bg-white p-6 rounded-[10px] shadow-sm border border-gray-200 flex items-center justify-between">
                     <div>
-                        <p className="text-gray-500 font-bold uppercase text-sm mb-1">Ventas Completadas</p>
-                        <p className="text-4xl font-bold text-gray-800">{stats.completedOrders}</p>
+                        <p className="text-gray-500 font-bold uppercase text-[1.4rem] mb-1">Ventas Completadas</p>
+                        <p className="text-[3.2rem] font-bold text-dark">{stats.completedOrders}</p>
                     </div>
-                    <FaCartShopping className="text-4xl text-green-500 opacity-50" />
+                    <FaCartShopping className="text-[4rem] text-green-500 opacity-50" />
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 flex items-center justify-between">
+                <div className="bg-white p-6 rounded-[10px] shadow-sm border border-gray-200 flex items-center justify-between">
                     <div>
-                        <p className="text-gray-500 font-bold uppercase text-sm mb-1">Usuarios Registrados</p>
-                        <p className="text-4xl font-bold text-gray-800">{stats.totalUsers}</p>
+                        <p className="text-gray-500 font-bold uppercase text-[1.4rem] mb-1">Usuarios Registrados</p>
+                        <p className="text-[3.2rem] font-bold text-dark">{stats.totalUsers}</p>
                     </div>
-                    <FaUsers className="text-4xl text-blue-500 opacity-50" />
+                    <FaUsers className="text-[4rem] text-blue-500 opacity-50" />
                 </div>
             </div>
 
             {/* Recent Sales Table */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Últimas Ventas</h3>
+            <div className="bg-white rounded-[10px] shadow-sm border border-gray-200 p-6">
+                <h3 className="text-[2rem] font-bold text-dark mb-4 border-b pb-2">Últimas Ventas</h3>
                 <table className="w-full text-left">
                     <thead>
-                        <tr className="text-sm text-gray-400 uppercase">
+                        <tr className="text-[1.4rem] text-gray-500 uppercase">
                             <th className="pb-3">Orden #</th>
                             <th className="pb-3">Cliente</th>
                             <th className="pb-3">Total</th>
@@ -71,15 +71,15 @@ export default function AdminActivity() {
                             <th className="pb-3">Estado</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y">
+                    <tbody className="divide-y text-[1.4rem]">
                         {stats.recentSales.map((sale: any) => (
-                            <tr key={sale.order_id} className="text-sm">
+                            <tr key={sale.order_id}>
                                 <td className="py-3 font-bold">{sale.order_number}</td>
                                 <td className="py-3">{sale.User?.name} {sale.User?.lastname}</td>
                                 <td className="py-3 font-bold text-green-600">$ {sale.total_amount}</td>
                                 <td className="py-3 text-gray-500">{new Date(sale.created_at).toLocaleDateString()}</td>
                                 <td className="py-3">
-                                    <span className={`px-2 py-1 rounded-full text-xs text-white ${sale.status === 'processing' ? 'bg-green-500' : 'bg-yellow-500'}`}>
+                                    <span className={`px-2 py-1 rounded-full text-[1.2rem] text-white ${sale.status === 'processing' ? 'bg-green-500' : 'bg-yellow-500'}`}>
                                         {sale.status === 'processing' ? 'Completado' : 'Pendiente'}
                                     </span>
                                 </td>

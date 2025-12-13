@@ -99,6 +99,55 @@ const adminControllers = {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+    },
+
+    // Get Product By ID
+    getProductById: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const item = await product.findByPk(id);
+            if (!item) return res.status(404).json({ error: 'Producto no encontrado' });
+            res.json(item);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
+    // Edit Product
+    editProduct: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const updated = await product.update({
+                ...req.body,
+                category_id: req.body.category || req.body.category_id,
+                licence_id: req.body.licence || req.body.licence_id,
+                image_front: req.body.image_front,
+                image_back: req.body.image_back
+            }, {
+                where: { product_id: id }
+            });
+
+            if (updated[0] === 0) return res.status(404).json({ error: 'Producto no encontrado o no modificado' });
+
+            res.json({ success: true, message: 'Producto actualizado' });
+        } catch (error) {
+            console.error("Edit Product Error:", error);
+            res.status(500).json({ error: error.message });
+        }
+    },
+
+    // Delete Product
+    deleteProduct: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const deleted = await product.destroy({ where: { product_id: id } });
+
+            if (!deleted) return res.status(404).json({ error: 'Producto no encontrado' });
+
+            res.json({ success: true, message: 'Producto eliminado' });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     }
 };
 
