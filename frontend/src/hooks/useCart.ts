@@ -37,7 +37,7 @@ export function useCart() {
 
     const addToCart = useCallback(async (productId: number, quantity: number = 1) => {
         if (!isAuthenticated) {
-            router.push("/login");
+            router.push("/shop/login");
             return;
         }
 
@@ -56,7 +56,7 @@ export function useCart() {
                 cancelButtonText: 'Seguir comprando'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    router.push('/cart');
+                    router.push('/shop/cart');
                     fetchCart(); // Refresh if we were on cart page (unlikely but safe)
                 }
             });

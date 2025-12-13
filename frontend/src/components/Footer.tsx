@@ -15,10 +15,10 @@ export default function Footer({ isAdmin = false }: FooterProps) {
                             <Link href="/shop" className="px-[1.6rem] py-[0.8rem] hover:bg-primary-900 transition-colors inline-block text-white">SHOP</Link>
                         </li>
                         <li className="font-medium text-[2rem] md:text-[1.8rem]">
-                            <Link href="/login" className="px-[1.6rem] py-[0.8rem] hover:bg-primary-900 transition-colors inline-block text-white">INGRESAR</Link>
+                            <Link href="/shop/login" className="px-[1.6rem] py-[0.8rem] hover:bg-primary-900 transition-colors inline-block text-white">INGRESAR</Link>
                         </li>
                         <li className="font-medium text-[2rem] md:text-[1.8rem]">
-                            <Link href="/contact" className="px-[1.6rem] py-[0.8rem] hover:bg-primary-900 transition-colors inline-block text-white">CONTACTO</Link>
+                            <Link href="/shop/contact" className="px-[1.6rem] py-[0.8rem] hover:bg-primary-900 transition-colors inline-block text-white">CONTACTO</Link>
                         </li>
                     </ul>
                 )}

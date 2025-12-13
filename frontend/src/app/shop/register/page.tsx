@@ -55,7 +55,7 @@ export default function Register() {
             } else {
                 setSuccess("Registro exitoso. Por favor inicia sesión.");
                 setTimeout(() => {
-                    router.push("/login");
+                    router.push("/shop/login");
                 }, 2000);
             }
 

@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         authUtils.removeToken();
         setToken(null);
         setUser(null);
-        router.push("/login");
+        router.push("/shop/login");
     };
 
     const isAuthenticated = !!token;

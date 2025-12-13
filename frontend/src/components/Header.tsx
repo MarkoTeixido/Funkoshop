@@ -57,7 +57,7 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
 
                 {/* Menu Items */}
                 <ul className={`
-                    fixed top-[6.8rem] left-0 w-full h-[calc(100vh-6.8rem)] bg-primary flex flex-col items-center gap-[1.6rem] pt-[1.6rem] z-40 transition-all duration-300 ease-in-out
+                    fixed top-[4.2rem] left-0 w-full h-[calc(100vh-4.5rem)] bg-primary flex flex-col items-center gap-[1.6rem] pt-[1.6rem] z-40 transition-all duration-300 ease-in-out
                     ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
                     min-[1000px]:translate-x-0 min-[1000px]:static min-[1000px]:h-auto min-[1000px]:w-auto min-[1000px]:bg-transparent min-[1000px]:flex-row min-[1000px]:gap-[2rem] min-[1000px]:pt-0
                 `}>
@@ -73,17 +73,6 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
                             </li>
                             <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
                                 <Link href="/admin/reports" onClick={() => setIsMenuOpen(false)}>REPORTES</Link>
-                            </li>
-                            {/* Notification Bell */}
-                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto flex justify-center items-center">
-                                <div className="relative cursor-pointer" title="Notificaciones de Stock">
-                                    <FaRegBell size={24} />
-                                    {notificationCount > 0 && (
-                                        <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[1rem] w-[1.6rem] h-[1.6rem] flex items-center justify-center rounded-full font-bold">
-                                            {notificationCount}
-                                        </span>
-                                    )}
-                                </div>
                             </li>
                             <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
                                 <button onClick={() => { logout(); setIsMenuOpen(false); }} className="uppercase">SALIR</button>
@@ -115,12 +104,12 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
                             </li>
 
                             <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/contact" onClick={() => setIsMenuOpen(false)}>CONTACTO</Link>
+                                <Link href="/shop/contact" onClick={() => setIsMenuOpen(false)}>CONTACTO</Link>
                             </li>
 
                             {!user ? (
                                 <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                    <Link href="/login" onClick={() => setIsMenuOpen(false)}>LOGIN</Link>
+                                    <Link href="/shop/login" onClick={() => setIsMenuOpen(false)}>LOGIN</Link>
                                 </li>
                             ) : (
                                 <li className="group relative hidden min-[1000px]:block">
@@ -134,10 +123,10 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
                                         ${isUserMenuOpen ? 'block' : 'hidden'}
                                     `}>
                                         <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left">
-                                            <Link href="/profile" onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}>Mi Perfil</Link>
+                                            <Link href="/shop/profile" onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}>Mi Perfil</Link>
                                         </li>
                                         <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left">
-                                            <Link href="/orders" onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}>Mis Pedidos</Link>
+                                            <Link href="/shop/orders" onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}>Mis Pedidos</Link>
                                         </li>
                                         <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left cursor-pointer" onClick={() => { logout(); setIsUserMenuOpen(false); setIsMenuOpen(false); }}>
                                             Cerrar Sesión
@@ -150,10 +139,10 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
                             {user && (
                                 <>
                                     <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center">
-                                        <Link href="/profile" onClick={() => setIsMenuOpen(false)}>MI PERFIL</Link>
+                                        <Link href="/shop/profile" onClick={() => setIsMenuOpen(false)}>MI PERFIL</Link>
                                     </li>
                                     <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center">
-                                        <Link href="/orders" onClick={() => setIsMenuOpen(false)}>MIS PEDIDOS</Link>
+                                        <Link href="/shop/orders" onClick={() => setIsMenuOpen(false)}>MIS PEDIDOS</Link>
                                     </li>
                                     <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center" onClick={() => { logout(); setIsMenuOpen(false); }}>
                                         CERRAR SESIÓN
@@ -161,7 +150,7 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
                                 </>
                             )}
                             <li className="hidden min-[1000px]:block flex items-center">
-                                <Link href="/cart">
+                                <Link href="/shop/cart">
                                     <FaCartShopping size={32} className="text-white hover:text-primary transition-colors" />
                                 </Link>
                             </li>
@@ -170,12 +159,27 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
 
                 </ul>
 
-                {/* Mobile Cart (Non-Admin) */}
-                {(!user || (user as any).role_id !== 1) && (
-                    <Link href="/cart" className="min-[1000px]:hidden">
-                        <FaCartShopping size={32} className="text-white hover:text-primary transition-colors" />
-                    </Link>
-                )}
+                {/* Right Side Icons */}
+                <div className="flex items-center gap-4">
+                    {/* Admin Bell */}
+                    {isAdmin && (
+                        <div className="relative cursor-pointer text-white hover:text-primary transition-colors" title="Notificaciones de Stock">
+                            <FaRegBell size={24} />
+                            {notificationCount > 0 && (
+                                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[1rem] w-[1.6rem] h-[1.6rem] flex items-center justify-center rounded-full font-bold">
+                                    {notificationCount}
+                                </span>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Mobile Cart (Non-Admin) */}
+                    {!isAdmin && (!user || (user as any).role_id !== 1) && (
+                        <Link href="/shop/cart" className="min-[1000px]:hidden">
+                            <FaCartShopping size={32} className="text-white hover:text-primary transition-colors" />
+                        </Link>
+                    )}
+                </div>
 
             </nav>
         </header>
