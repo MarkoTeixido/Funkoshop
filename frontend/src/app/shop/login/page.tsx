@@ -25,10 +25,22 @@ export default function Login() {
         }
     };
 
+    const handleExampleUser = () => {
+        setFormData({ email: "juan@ejemplo.com", password: "Contraseña1." });
+    };
+
     return (
         <div className="standard-container py-[8rem] flex justify-center items-center">
             <form onSubmit={handleSubmit} className="w-full max-w-[500px] flex flex-col gap-[2.4rem]">
-                <h2 className="text-[3.8rem] font-bold text-center uppercase font-raleway mb-[2rem]">Ingresar a mi cuenta</h2>
+                <h2 className="text-[3.8rem] font-bold text-center uppercase font-raleway mb-2">Ingresar a mi cuenta</h2>
+
+                <button
+                    type="button"
+                    onClick={handleExampleUser}
+                    className="self-center text-[1.4rem] text-blue-500 hover:text-blue-700 font-medium underline mb-4"
+                >
+                    Usar usuario de ejemplo
+                </button>
 
                 {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
@@ -71,6 +83,12 @@ export default function Login() {
                 <Link href="#" className="text-[1.4rem] text-blue-500 hover:underline">Olvidé mi contraseña</Link>
                 <div className="text-[1.4rem] text-center mt-4">
                     ¿No tienes una cuenta? <Link href="/shop/register" className="text-primary font-bold hover:underline">Regístrate</Link>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+                    <Link href="/admin/login" className="inline-block px-6 py-2 border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white transition-colors rounded-full text-[1.4rem]">
+                        ¿Quieres probar el modulo admin?
+                    </Link>
                 </div>
             </form>
         </div>

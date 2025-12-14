@@ -11,6 +11,11 @@ export default function AdminLoginPage() {
     const { login } = useAuth();
     const router = useRouter();
 
+    const handleExampleAdmin = () => {
+        setEmail('admin@funkoshop.com');
+        setPassword('AdminPassword123!');
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -45,6 +50,13 @@ export default function AdminLoginPage() {
                 <div className="bg-primary p-6 text-center">
                     <h1 className="text-white text-3xl font-bold uppercase tracking-wider">Admin Portal</h1>
                     <p className="text-white/80 mt-2 text-sm">Acceso Exclusivo</p>
+                    <button
+                        type="button"
+                        onClick={handleExampleAdmin}
+                        className="mt-3 text-[10px] uppercase tracking-widest bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded transition-colors border border-white/20"
+                    >
+                        Usar usuario de ejemplo
+                    </button>
                 </div>
 
                 <div className="p-8">
