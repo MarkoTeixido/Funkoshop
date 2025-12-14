@@ -4,7 +4,7 @@
 
 Esta es una aplicación web moderna que simula un E-Commerce real de figuras coleccionables. El proyecto ha evolucionado a una arquitectura separada (Frontend y Backend) para ofrecer una experiencia más robusta, escalable y dinámica.
 
-Ofrece funcionalidades completas de búsqueda, filtrado, carrito de compras y panel de administración para la gestión de productos (CRUD).
+Ofrece funcionalidades completas de búsqueda, filtrado, carrito de compras y panel de administración para la gestión de productos (CRUD, Actividad y Reportes).
 
 ![377shots_so](https://github.com/MarkoTeixido/FunkoshopCaC-Backend/assets/89801822/d0f4e578-46e3-47e7-a9dc-1922f162e6e4)
 ![373shots_so](https://github.com/MarkoTeixido/FunkoshopCaC-Backend/assets/89801822/5ec3d463-f93c-413f-88e0-4f2decc3a982)
@@ -41,7 +41,7 @@ _Estas instrucciones te permitirán obtener una copia del proyecto en funcionami
 ### Clonar el Repositorio
 
 ```bash
-git clone https://github.com/MarkoTeixido/fkshop.git
+git clone https://github.com/MarkoTeixido/Funkoshop.git
 ```
 *(Asegúrate de usar la URL correcta de tu repositorio)*
 
@@ -93,7 +93,7 @@ git clone https://github.com/MarkoTeixido/fkshop.git
    npm run dev
    ```
 
-¡Listo! Accede a la aplicación en `http://localhost:3001` (o el puerto que indique Next.js).
+¡Listo! Accede a la aplicación en `http://localhost:3000` (o el puerto que indique Next.js).
 
 ## Documentación Detallada 📚
 
@@ -103,4 +103,4 @@ Para más detalles sobre cada parte del proyecto, consulta los archivos específ
 
 ## Autor
 
-**Marko Teixido**
+* **Marko Teixido** - [https://github.com/MarkoTeixido](https://github.com/MarkoTeixido)
