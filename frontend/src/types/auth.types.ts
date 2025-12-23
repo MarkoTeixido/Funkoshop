@@ -14,9 +14,11 @@ export interface User {
 }
 
 export interface LoginResponse {
-    token: string;
-    user: User;
+    success?: boolean;
     message?: string;
+    token: string;
+    refreshToken?: string;
+    user: User;
 }
 
 export interface RegisterDTO {

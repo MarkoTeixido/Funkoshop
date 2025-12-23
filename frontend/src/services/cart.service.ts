@@ -2,7 +2,9 @@ import { api } from './api';
 
 export const cartService = {
     addToCart: async (productId: number, quantity: number = 1) => {
+        console.log('🛒 [Cart Service] Adding to cart:', { productId, quantity });
         const response = await api.post('/shop/cart', { product_id: productId, quantity });
+        console.log('🛒 [Cart Service] Response:', response.data);
         return response; // Data is returned directly per interceptor
     },
 

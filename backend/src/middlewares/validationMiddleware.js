@@ -10,6 +10,9 @@ const { HTTP_CODES } = require('../utils/constants');
 const validateRequest = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        console.log('❌ [Validation] Failed for:', req.method, req.path);
+        console.log('  Errors:', errors.array());
+        console.log('  Body:', req.body);
         return res.status(HTTP_CODES.BAD_REQUEST).json({
             status: 'fail',
             message: 'Validation failed',

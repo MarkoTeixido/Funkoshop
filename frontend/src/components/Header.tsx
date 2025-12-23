@@ -2,8 +2,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaBars, FaXmark, FaChevronDown, FaChevronUp, FaUser, FaRegBell, FaCartShopping } from "react-icons/fa6";
+import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaBars, FaXmark, FaUser, FaRegBell, FaCartShopping, FaChevronDown } from "react-icons/fa6";
 import { useAuth } from "@/context/AuthContext";
+import { cn } from "@/utils/cn";
 
 interface HeaderProps {
     isAdmin?: boolean;
@@ -11,177 +14,218 @@ interface HeaderProps {
 }
 
 export default function Header({ isAdmin = false, notificationCount = 0 }: HeaderProps) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const { user, logout } = useAuth();
+    const pathname = usePathname();
 
-    // Lock scroll when menu is open
+    // Handle Scroll
     useEffect(() => {
-        if (isMenuOpen && window.innerWidth < 1000) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "auto";
-        }
+        const handleScroll = () => setIsScrolled(window.scrollY > 20);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
-        // Cleanup
+    // Lock Body Scroll
+    useEffect(() => {
+        if (isMobileMenuOpen) document.body.style.overflow = "hidden";
+        else document.body.style.overflow = "auto";
         return () => { document.body.style.overflow = "auto"; };
-    }, [isMenuOpen]);
+    }, [isMobileMenuOpen]);
 
-    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-    const toggleSubmenu = () => setIsSubmenuOpen(!isSubmenuOpen);
-    const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
+    const navLinks = isAdmin ? [
+        { name: "PRODUCTOS", href: "/admin/dashboard" },
+        { name: "ACTIVIDAD", href: "/admin/activity" },
+        { name: "REPORTES", href: "/admin/reports" },
+    ] : [
+        { name: "SHOP", href: "/shop" },
+        { name: "CONTACTO", href: "/shop/contact" },
+    ];
+
+    const mobileMenuVariants = {
+        closed: { opacity: 0, x: "100%" },
+        open: { opacity: 1, x: 0, transition: { staggerChildren: 0.1, delayChildren: 0.2 } }
+    };
+
+    const itemVariants = {
+        closed: { opacity: 0, x: 50 },
+        open: { opacity: 1, x: 0 }
+    };
 
     return (
-        <header className="bg-dark-bg z-50 relative">
-            <nav className="standard-container mx-auto flex justify-between items-center py-[0.8rem] min-[1000px]:py-[2.8rem] relative">
-
-                {/* Mobile Menu Button */}
-                <div className="min-[1000px]:hidden text-white cursor-pointer z-50" onClick={toggleMenu}>
-                    {isMenuOpen ? <FaXmark size={24} /> : <FaBars size={24} />}
-                </div>
-
+        <header
+            className={cn(
+                "fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b",
+                isScrolled
+                    ? "bg-[#141414] border-white/10 shadow-lg py-3"
+                    : "bg-transparent border-transparent py-5"
+            )}
+        >
+            <nav className="container-custom flex justify-between items-center">
                 {/* Logo */}
-                <div className="max-w-[150px] min-[1000px]:max-w-[300px]">
-                    <Link href="/">
-                        <Image
-                            src="https://res.cloudinary.com/dp7jr9k94/image/upload/v1765590926/logo_light_horizontal_cz3q8t.svg"
-                            alt="Funkoshop Logo"
-                            width={200}
-                            height={50}
-                            className="w-full h-auto"
-                            priority
-                        />
-                    </Link>
-                </div>
+                <Link href="/" className="relative z-50">
+                    <Image
+                        src="https://res.cloudinary.com/dp7jr9k94/image/upload/v1765590926/logo_light_horizontal_cz3q8t.svg"
+                        alt="Funkoshop Logo"
+                        width={180}
+                        height={45}
+                        className="w-32 md:w-44 h-auto object-contain hover:opacity-90 transition-opacity"
+                        priority
+                    />
+                </Link>
 
-                {/* Menu Items */}
-                <ul className={`
-                    fixed top-[4.2rem] left-0 w-full h-[calc(100vh-4.5rem)] bg-primary flex flex-col items-center gap-[1.6rem] pt-[1.6rem] z-40 transition-all duration-300 ease-in-out
-                    ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-                    min-[1000px]:translate-x-0 min-[1000px]:static min-[1000px]:h-auto min-[1000px]:w-auto min-[1000px]:bg-transparent min-[1000px]:flex-row min-[1000px]:gap-[2rem] min-[1000px]:pt-0
-                `}>
-
-                    {isAdmin ? (
-                        /* Admin Menu */
-                        <>
-                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/admin/dashboard" onClick={() => setIsMenuOpen(false)}>PRODUCTOS</Link>
-                            </li>
-                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/admin/activity" onClick={() => setIsMenuOpen(false)}>ACTIVIDAD</Link>
-                            </li>
-                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/admin/reports" onClick={() => setIsMenuOpen(false)}>REPORTES</Link>
-                            </li>
-                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <button onClick={() => { logout(); setIsMenuOpen(false); }} className="uppercase">SALIR</button>
-                            </li>
-                        </>
-                    ) : (
-                        /* Main Menu */
-                        <>
-                            {/* Shop Dropdown */}
-                            <li className="group relative text-[1.8rem] font-medium text-white w-full min-[1000px]:w-auto flex flex-col items-center min-[1000px]:block">
-                                <div className="flex items-center justify-center gap-1 cursor-pointer px-[1.6rem] py-[0.8rem] hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors w-full min-[1000px]:w-auto">
-                                    <Link href="/shop" onClick={() => setIsMenuOpen(false)}>SHOP</Link>
-                                    <span onClick={(e) => { e.preventDefault(); toggleSubmenu(); }} className="min-[1000px]:hidden p-2">
-                                        {isSubmenuOpen ? <FaChevronUp size={16} /> : <FaChevronDown size={16} />}
-                                    </span>
-                                    <FaChevronDown className="hidden min-[1000px]:inline-block ml-1 size-4" />
-                                </div>
-
-                                {/* Submenu */}
-                                <ul className={`
-                                    bg-dark-bg w-full items-center
-                                    ${isSubmenuOpen ? 'flex flex-col' : 'hidden'}
-                                    min-[1000px]:hidden min-[1000px]:group-hover:block min-[1000px]:absolute min-[1000px]:left-0 min-[1000px]:w-[150px] min-[1000px]:z-50
-                                `}>
-                                    <li className="hover:bg-primary-900 px-[1.6rem] py-[0.8rem] w-full text-center min-[1000px]:text-left"><Link href="/shop" onClick={() => setIsMenuOpen(false)}>Funkos</Link></li>
-                                    <li className="hover:bg-primary-900 px-[1.6rem] py-[0.8rem] w-full text-center min-[1000px]:text-left"><Link href="/shop" onClick={() => setIsMenuOpen(false)}>Ropa</Link></li>
-                                    <li className="hover:bg-primary-900 px-[1.6rem] py-[0.8rem] w-full text-center min-[1000px]:text-left"><Link href="/shop" onClick={() => setIsMenuOpen(false)}>Accesorios</Link></li>
-                                </ul>
-                            </li>
-
-                            <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                <Link href="/shop/contact" onClick={() => setIsMenuOpen(false)}>CONTACTO</Link>
-                            </li>
-
-                            {!user ? (
-                                <li className="text-[1.8rem] font-medium text-white hover:bg-dark-bg min-[1000px]:hover:bg-primary-900 transition-colors px-[1.6rem] py-[0.8rem] w-full min-[1000px]:w-auto text-center">
-                                    <Link href="/shop/login" onClick={() => setIsMenuOpen(false)}>LOGIN</Link>
-                                </li>
-                            ) : (
-                                <li className="group relative hidden min-[1000px]:block">
-                                    <div className="cursor-pointer text-white hover:text-primary transition-colors" onClick={toggleUserMenu}>
-                                        <FaUser size={24} />
-                                    </div>
-
-                                    {/* User Dropdown */}
-                                    <ul className={`
-                                        bg-dark-bg w-[180px] absolute top-[40px] right-0 z-50 flex flex-col shadow-lg rounded-b-lg border border-primary
-                                        ${isUserMenuOpen ? 'block' : 'hidden'}
-                                    `}>
-                                        <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left">
-                                            <Link href="/shop/profile" onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}>Mi Perfil</Link>
-                                        </li>
-                                        <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left">
-                                            <Link href="/shop/orders" onClick={() => { setIsUserMenuOpen(false); setIsMenuOpen(false); }}>Mis Pedidos</Link>
-                                        </li>
-                                        <li className="hover:bg-primary-900 px-[1.6rem] py-[1.2rem] text-[1.4rem] font-medium text-white text-left cursor-pointer" onClick={() => { logout(); setIsUserMenuOpen(false); setIsMenuOpen(false); }}>
-                                            Cerrar Sesión
-                                        </li>
-                                    </ul>
-                                </li>
-                            )}
-
-                            {/* Mobile User Links (Visible only on mobile when logged in) */}
-                            {user && (
-                                <>
-                                    <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center">
-                                        <Link href="/shop/profile" onClick={() => setIsMenuOpen(false)}>MI PERFIL</Link>
-                                    </li>
-                                    <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center">
-                                        <Link href="/shop/orders" onClick={() => setIsMenuOpen(false)}>MIS PEDIDOS</Link>
-                                    </li>
-                                    <li className="min-[1000px]:hidden text-[1.8rem] font-medium text-white hover:bg-dark-bg transition-colors px-[1.6rem] py-[0.8rem] w-full text-center" onClick={() => { logout(); setIsMenuOpen(false); }}>
-                                        CERRAR SESIÓN
-                                    </li>
-                                </>
-                            )}
-                            <li className="hidden min-[1000px]:block flex items-center">
-                                <Link href="/shop/cart">
-                                    <FaCartShopping size={32} className="text-white hover:text-primary transition-colors" />
+                {/* Desktop Nav */}
+                <div className="hidden lg:flex items-center gap-8">
+                    <ul className="flex items-center gap-8">
+                        {navLinks.map((link) => (
+                            <li key={link.name}>
+                                <Link
+                                    href={link.href}
+                                    className={cn(
+                                        "text-sm font-bold tracking-widest hover:text-primary transition-colors",
+                                        pathname === link.href ? "text-primary" : "text-white"
+                                    )}
+                                >
+                                    {link.name}
                                 </Link>
                             </li>
-                        </>
-                    )}
+                        ))}
+                    </ul>
 
-                </ul>
+                    {/* Search Bar */}
+                    <div className="relative group hidden xl:block">
+                        <input
+                            type="text"
+                            placeholder="Buscar..."
+                            className="bg-white/10 border border-white/10 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-primary w-40 focus:w-64 transition-all"
+                        />
+                    </div>
 
-                {/* Right Side Icons */}
-                <div className="flex items-center gap-4">
-                    {/* Admin Bell */}
-                    {isAdmin && (
-                        <div className="relative cursor-pointer text-white hover:text-primary transition-colors" title="Notificaciones de Stock">
-                            <FaRegBell size={24} />
-                            {notificationCount > 0 && (
-                                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[1rem] w-[1.6rem] h-[1.6rem] flex items-center justify-center rounded-full font-bold">
-                                    {notificationCount}
-                                </span>
-                            )}
-                        </div>
-                    )}
+                    {/* Actions */}
+                    <div className="flex items-center gap-6 border-l border-white/10 pl-6">
+                        {isAdmin && (
+                            <button className="relative text-white hover:text-primary transition-colors">
+                                <FaRegBell size={20} />
+                                {notificationCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] size-4 flex items-center justify-center rounded-full font-bold">
+                                        {notificationCount}
+                                    </span>
+                                )}
+                            </button>
+                        )}
 
-                    {/* Mobile Cart (Non-Admin) */}
-                    {!isAdmin && (!user || (user as any).role_id !== 1) && (
-                        <Link href="/shop/cart" className="min-[1000px]:hidden">
-                            <FaCartShopping size={32} className="text-white hover:text-primary transition-colors" />
-                        </Link>
-                    )}
+                        {!isAdmin && (
+                            <Link href="/shop/cart" className="text-white hover:text-primary transition-colors relative group">
+                                <FaCartShopping size={20} />
+                            </Link>
+                        )}
+
+                        {user ? (
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                                    className="flex items-center gap-2 text-white hover:text-primary transition-colors"
+                                >
+                                    <FaUser size={20} />
+                                    <span className="text-sm font-medium max-w-[100px] truncate">{user.name}</span>
+                                    <FaChevronDown size={10} />
+                                </button>
+
+                                {/* Dropdown */}
+                                <AnimatePresence>
+                                    {isUserMenuOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: 10 }}
+                                            className="absolute top-full right-0 mt-4 w-48 bg-[#141414] border border-white/10 rounded-lg shadow-xl overflow-hidden py-2"
+                                        >
+                                            <Link href="/shop/profile" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">Mi Perfil</Link>
+                                            <Link href="/shop/orders" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">Mis Pedidos</Link>
+                                            <button
+                                                onClick={logout}
+                                                className="w-full text-left px-4 py-2 text-sm text-primary hover:bg-white/5"
+                                            >
+                                                Cerrar Sesión
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        ) : (
+                            <Link
+                                href="/shop/login"
+                                className="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all transform hover:scale-105"
+                            >
+                                INICIAR SESIÓN
+                            </Link>
+                        )}
+                    </div>
                 </div>
 
+                {/* Mobile Toggle */}
+                <button
+                    className="lg:hidden text-white z-50 p-2"
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                    {isMobileMenuOpen ? <FaXmark size={24} /> : <FaBars size={24} />}
+                </button>
             </nav>
+
+            {/* Mobile Menu Overlay */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        variants={mobileMenuVariants}
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="fixed inset-0 bg-dark-bg z-40 flex flex-col items-center justify-center lg:hidden"
+                    >
+                        <ul className="flex flex-col items-center gap-8">
+                            {navLinks.map((link) => (
+                                <motion.li key={link.name} variants={itemVariants}>
+                                    <Link
+                                        href={link.href}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="text-2xl font-bold text-white hover:text-primary tracking-wider"
+                                    >
+                                        {link.name}
+                                    </Link>
+                                </motion.li>
+                            ))}
+
+                            {user ? (
+                                <>
+                                    <motion.li variants={itemVariants} className="w-12 h-px bg-white/10 my-4" />
+                                    <motion.li variants={itemVariants}>
+                                        <Link href="/shop/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-gray-300">
+                                            Mi Perfil
+                                        </Link>
+                                    </motion.li>
+                                    <motion.li variants={itemVariants}>
+                                        <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="text-xl text-primary">
+                                            Cerrar Sesión
+                                        </button>
+                                    </motion.li>
+                                </>
+                            ) : (
+                                <motion.li variants={itemVariants} className="mt-8">
+                                    <Link
+                                        href="/shop/login"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="bg-primary text-white text-lg font-bold px-8 py-3 rounded-full"
+                                    >
+                                        INICIAR SESIÓN
+                                    </Link>
+                                </motion.li>
+                            )}
+                        </ul>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </header>
     );
 }

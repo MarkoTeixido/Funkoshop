@@ -13,15 +13,35 @@ const { HTTP_CODES, ROLES } = require('../utils/constants');
 
 class AuthService {
     async login(email, password, requiredRole = null) {
-        const user = await userRepository.findByEmail(email); // Need to add findByEmail to UserRepository
+        console.log('🔐 [AuthService.login] Starting login process...');
+        console.log('  Email:', email);
+        console.log('  Password length:', password?.length);
+        console.log('  Required role:', requiredRole);
 
-        if (!user || !(await bcryptjs.compare(password, user.password))) {
+        const user = await userRepository.findByEmail(email);
+        console.log('  User found:', user ? `Yes (ID: ${user.id}, Role: ${user.role})` : 'No');
+
+        if (!user) {
+            console.log('  ❌ Login failed: User not found');
+            throw new AppError('Credenciales inválidas', HTTP_CODES.UNAUTHORIZED);
+        }
+
+        const passwordMatch = await bcryptjs.compare(password, user.password);
+        console.log('  Password match:', passwordMatch ? '✅ Yes' : '❌ No');
+
+        if (!passwordMatch) {
+            console.log('  ❌ Login failed: Invalid password');
             throw new AppError('Credenciales inválidas', HTTP_CODES.UNAUTHORIZED);
         }
 
         if (requiredRole && user.role !== requiredRole) {
+            console.log('  ❌ Login failed: Role mismatch');
+            console.log('    User role:', user.role);
+            console.log('    Required role:', requiredRole);
             throw new AppError('Acceso denegado', HTTP_CODES.UNAUTHORIZED);
         }
+
+        console.log('  ✅ Login successful!');
 
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);

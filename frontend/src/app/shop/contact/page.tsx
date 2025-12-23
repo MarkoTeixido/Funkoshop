@@ -1,52 +1,122 @@
+"use client";
+import React from 'react';
+import { FaPhone, FaEnvelope, FaLocationDot, FaPaperPlane } from "react-icons/fa6";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
 export default function Contact() {
     return (
-        <div className="container py-[8rem] flex justify-center text-dark">
-            <div className="flex flex-col lg:flex-row gap-[4rem] lg:gap-[8rem] w-full max-w-[1000px]">
-                {/* Left Side: Info */}
-                <section className="flex-1 flex flex-col gap-[4rem]">
-                    <div className="flex flex-col gap-[1rem]">
-                        <div className="flex items-center gap-[1rem]">
-                            {/* Phone Icon */}
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512" className="fill-current"><path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z" /></svg>
-                            <h3 className="text-[2rem] font-bold">TELÉFONO</h3>
-                        </div>
-                        <p className="text-[1.8rem]">+54 011 4736-6830</p>
-                        <p className="text-[1.8rem]">+54 011 4906-6880</p>
+        <div className="bg-dark-bg min-h-screen flex flex-col">
+            <main className="flex-grow pt-32 pb-20 px-4 relative overflow-hidden">
+                {/* Background Details */}
+                <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none -translate-x-1/2 translate-y-1/2" />
+
+                <div className="container-custom relative z-10 max-w-5xl mx-auto">
+                    <div className="text-center mb-10">
+                        <h1 className="text-4xl md:text-5xl font-black italic uppercase text-white mb-2">Get In Touch</h1>
+                        <p className="text-gray-400 max-w-xl mx-auto text-sm">
+                            Have a question, suggestion, or just want to talk about Funkos? We'd love to hear from you.
+                        </p>
                     </div>
 
-                    <div className="flex flex-col gap-[1rem]">
-                        <div className="flex items-center gap-[1rem]">
-                            {/* Envelope Icon */}
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 512 512" className="fill-current"><path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z" /></svg>
-                            <h3 className="text-[2rem] font-bold">CORREO</h3>
-                        </div>
-                        <p className="text-[1.8rem]">cacfunkoshop@gmail.com</p>
-                        <p className="text-[1.8rem]">info.funkoshopcac@gmail.com</p>
-                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                        {/* Info Section */}
+                        <div className="space-y-6">
+                            {/* Info Cards */}
+                            <div className="grid gap-4">
+                                <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl hover:border-primary/50 transition-all group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-primary/20 text-primary rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                            <FaPhone size={18} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-bold text-white uppercase mb-1">Phone</h3>
+                                            <p className="text-gray-400 font-light text-sm">+54 011 4736-6830</p>
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <div className="flex flex-col gap-[1rem]">
-                        <div className="flex items-center gap-[1rem]">
-                            {/* Location Dot Icon */}
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 384 512" className="fill-current"><path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" /></svg>
-                            <h3 className="text-[2rem] font-bold">UBICACIÓN</h3>
-                        </div>
-                        <p className="text-[1.8rem]">Recoleta, C1334</p>
-                        <p className="text-[1.8rem]">CABA</p>
-                    </div>
-                </section>
+                                <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl hover:border-primary/50 transition-all group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-blue-500/20 text-blue-500 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                            <FaEnvelope size={18} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-bold text-white uppercase mb-1">Email</h3>
+                                            <p className="text-gray-400 font-light text-sm">contact@funkoshop.com</p>
+                                        </div>
+                                    </div>
+                                </div>
 
-                {/* Right Side: Form */}
-                <section className="flex-1">
-                    <h1 className="text-[3.8rem] font-bold uppercase font-raleway mb-[2rem]">CONTÁCTANOS</h1>
-                    <form className="flex flex-col gap-[2rem]">
-                        <input className="border-b-2 border-primary py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400 w-full" type="text" placeholder="Nombre Completo" />
-                        <input className="border-b-2 border-primary py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400 w-full" type="email" placeholder="Email" />
-                        <input className="border-b-2 border-primary py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400 w-full" type="text" placeholder="Asunto" />
-                        <textarea className="border-b-2 border-primary py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400 w-full resize-none" rows={10} placeholder="Escriba Su Mensaje..."></textarea>
-                        <button className="bg-dark-bg text-white px-[3.2rem] py-[1.2rem] text-[1.6rem] font-medium hover:bg-primary-900 transition-colors uppercase self-start">Enviar</button>
-                    </form>
-                </section>
-            </div>
+                                <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl hover:border-primary/50 transition-all group">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-purple-500/20 text-purple-500 rounded-lg flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                            <FaLocationDot size={18} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-bold text-white uppercase mb-1">Location</h3>
+                                            <p className="text-gray-400 font-light text-sm">Buenos Aires, Argentina</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Form Section */}
+                        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 md:p-8 rounded-3xl shadow-2xl">
+                            <h2 className="text-xl font-bold text-white uppercase mb-6 flex items-center gap-3">
+                                Send Message <span className="w-8 h-[1px] bg-primary block" />
+                            </h2>
+
+                            <form className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Name</label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-black/20 border border-white/10 rounded-lg py-3 px-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                            placeholder="John Doe"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Email</label>
+                                        <input
+                                            type="email"
+                                            className="w-full bg-black/20 border border-white/10 rounded-lg py-3 px-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                            placeholder="john@example.com"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Subject</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg py-3 px-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                        placeholder="Order Inquiry"
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Message</label>
+                                    <textarea
+                                        rows={4}
+                                        className="w-full bg-black/20 border border-white/10 rounded-lg py-3 px-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all resize-none"
+                                        placeholder="How can we help you?"
+                                    />
+                                </div>
+
+                                <button
+                                    className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 rounded-lg shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] group uppercase tracking-wider text-sm mt-2"
+                                >
+                                    Send <FaPaperPlane className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     );
 }

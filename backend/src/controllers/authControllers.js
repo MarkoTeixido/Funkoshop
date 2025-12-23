@@ -8,22 +8,14 @@ const authControllers = {
 
   loginUser: asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    // Basic login (User or Admin can login here? Usually specific logic. Original code had separate endpoints)
-    // Original: loginUser checked `if (user.role === 'admin') fail`.
-    // So this checks if role is USER.
-
-    const result = await authService.login(email, password); // We can implement role check inside service or here
-    if (result.user.role !== ROLES.USER) {
-      // In service_auth I added requiredRole, let's use it if I update usage
-    }
-
-    // Actually, let's call service with expected role
     const authData = await authService.login(email, password, ROLES.USER);
 
     res.json({
       success: true,
       message: 'Login exitoso',
-      ...authData
+      token: authData.accessToken,  // Frontend expects 'token' not 'accessToken'
+      refreshToken: authData.refreshToken,
+      user: authData.user
     });
   }),
 
@@ -34,7 +26,9 @@ const authControllers = {
     res.json({
       success: true,
       message: 'Admin Login exitoso',
-      ...authData
+      token: authData.accessToken,  // Frontend expects 'token' not 'accessToken'
+      refreshToken: authData.refreshToken,
+      user: authData.user
     });
   }),
 

@@ -1,89 +1,105 @@
 "use client";
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import { useCart } from "@/hooks/useCart";
-import CartItem from "@/components/cart/CartItem";
-import Loader from "@/components/ui/Loader";
+import React, { useEffect } from 'react';
+import Link from 'next/link';
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import CartItem from "@/components/shop/CartItem";
+import OrderSummary from "@/components/shop/OrderSummary";
+import { useCart } from '@/hooks/useCart';
+import { FaArrowLeft } from "react-icons/fa6";
 
-export default function Cart() {
-    const { user, isAuthenticated } = useAuth();
-    const { cartItems, loading, error, fetchCart, updateQuantity, removeItem, subtotal } = useCart();
-    const router = useRouter();
+export default function CartPage() {
+    const { cartItems, removeItem, updateQuantity, subtotal, fetchCart } = useCart();
 
     useEffect(() => {
-        if (isAuthenticated) {
-            fetchCart();
-        }
-    }, [isAuthenticated, fetchCart]);
+        fetchCart();
+    }, [fetchCart]);
+
+    // Auto-calculate free shipping > $50
+    const shipping = subtotal > 50 ? 0 : 10;
+    const tax = subtotal * 0.08; // 8% Tax Mockup
 
     const handleCheckout = () => {
-        router.push("/checkout");
+        alert("Proceeding to checkout...");
     };
 
-    if (loading && cartItems.length === 0) return <div className="container py-[8rem]"><Loader /></div>;
-
-    if (!user) return (
-        <div className="container py-[8rem] text-center">
-            <h2 className="text-[2.4rem] font-bold mb-4">Debes iniciar sesión para ver tu carrito</h2>
-            <button onClick={() => router.push("/login")} className="bg-dark-bg text-white px-6 py-2 rounded text-[1.6rem]">Iniciar Sesión</button>
-        </div>
-    );
-
     return (
-        <div className="standard-container py-[8rem] text-dark relative">
-            <section className="flex flex-col gap-[4rem] mb-[4rem]">
-                <h1 className="text-[3.8rem] font-bold uppercase border-b-[4px] border-primary pb-[1.2rem] w-full max-w-[600px]">CARRITO DE COMPRAS</h1>
+        <div className="bg-dark-bg min-h-screen flex flex-col">
+            <main className="flex-grow pt-32 pb-20">
+                <div className="container-custom">
 
-                {error && <div className="bg-red-100 text-red-700 p-4 rounded text-[1.6rem]">{error}</div>}
-
-                {cartItems.length === 0 ? (
-                    <p className="text-[2rem] text-center py-10">Tu carrito está vacío.</p>
-                ) : (
-                    <div className="flex flex-col gap-[2rem]">
-                        <div className="hidden md:grid grid-cols-[3fr_1fr_1fr_auto] gap-[2rem] font-bold text-[1.8rem] px-[2rem] shadow-sm pb-4 rounded-[10px]">
-                            <p>DETALLE DEL PRODUCTO</p>
-                            <p>CANTIDAD</p>
-                            <p>TOTAL</p>
-                            <p></p>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
+                        <div>
+                            <h1 className="text-4xl md:text-6xl font-black text-white italic uppercase mb-2">Your Cart</h1>
+                            <p className="text-gray-400">
+                                {subtotal > 50
+                                    ? <span className="text-green-500 font-bold">You've qualified for Free Shipping!</span>
+                                    : `Add $${(50 - subtotal).toFixed(2)} more for Free Shipping.`
+                                }
+                            </p>
                         </div>
-
-                        {cartItems.map((item) => (
-                            <CartItem
-                                key={item.cart_item_id}
-                                item={item}
-                                onUpdateQuantity={updateQuantity}
-                                onRemove={removeItem}
-                            />
-                        ))}
+                        <Link href="/shop" className="text-white hover:text-primary font-bold flex items-center gap-2 transition-colors">
+                            <FaArrowLeft /> Continue Shopping
+                        </Link>
                     </div>
-                )}
-            </section>
 
-            {cartItems.length > 0 && (
-                <section className="flex flex-col gap-[4rem] items-end">
-                    <h2 className="text-[3.8rem] font-bold uppercase border-b-[4px] border-primary pb-[1.2rem] w-full max-w-[600px] text-right">RESUMEN</h2>
-                    <div className="bg-light-bg rounded-[10px] w-full max-w-[600px] shadow-md">
-                        <div className="p-[2rem] flex justify-between items-center text-[1.8rem] border-b border-gray-300">
-                            <p>CANTIDAD DE ELEMENTOS</p>
-                            <p>{cartItems.reduce((acc, i) => acc + i.quantity, 0)}</p>
+                    {cartItems.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-white/10 rounded-2xl bg-white/5">
+                            <h2 className="text-2xl font-bold text-white mb-4">Your cart is empty</h2>
+                            <p className="text-gray-400 mb-8">Looks like you haven't added any Funkos yet.</p>
+                            <Link href="/shop" className="bg-primary hover:bg-primary-hover text-white font-bold px-8 py-3 rounded-full transition-colors">
+                                Start Shopping
+                            </Link>
                         </div>
-                        <div className="p-[2rem] flex justify-between items-center text-[1.8rem] border-b border-gray-300">
-                            <p>SUBTOTAL</p>
-                            <p>$ {subtotal.toFixed(2)}</p>
+                    ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                            {/* Cart List */}
+                            <div className="lg:col-span-2 space-y-4">
+                                <div className="hidden md:flex justify-between text-xs font-bold text-gray-500 uppercase tracking-widest px-6 mb-2">
+                                    <span>Product</span>
+                                    <div className="flex gap-20 pr-12">
+                                        <span>Quantity</span>
+                                        <span>Price</span>
+                                    </div>
+                                </div>
+
+                                {cartItems.map((item) => (
+                                    <CartItem
+                                        key={item.product_id}
+                                        id={item.product_id}
+                                        name={item.Product?.product_name || "Unknown Product"}
+                                        price={typeof item.Product?.price === 'string' ? parseFloat(item.Product.price) : item.Product?.price || 0}
+                                        quantity={item.quantity}
+                                        image={item.Product?.image_front || "https://res.cloudinary.com/dp7jr9k94/image/upload/v1703182285/ironman_box_placeholder.png"}
+                                        stock={item.Product?.stock || 0}
+                                        onUpdateQuantity={updateQuantity}
+                                        onRemove={removeItem}
+                                        category={(item.Product?.licence as any)?.licence_name || item.Product?.licence || "Pop! Vinyl"}
+                                        condition="Mint"
+                                    />
+                                ))}
+
+                                <div className="flex justify-end pt-4">
+                                    {/* Clear Cart functionality not in hook yet, hiding button or ignoring */}
+                                    {/* <button className="text-sm text-red-500 hover:text-red-400 underline font-bold">Clear Cart</button> */}
+                                </div>
+                            </div>
+
+                            {/* Summary */}
+                            <div className="lg:col-span-1">
+                                <OrderSummary
+                                    subtotal={subtotal}
+                                    shipping={shipping}
+                                    tax={tax}
+                                    onCheckout={handleCheckout}
+                                />
+                            </div>
                         </div>
-                        <div className="p-[2rem] flex justify-between items-center text-[1.8rem] border-b border-gray-300">
-                            <p>ENVIO</p>
-                            <p>$ 0,00</p>
-                        </div>
-                        <div className="p-[2rem] flex justify-between items-center text-[2.4rem] font-bold text-primary">
-                            <p>TOTAL</p>
-                            <p>$ {subtotal.toFixed(2)}</p>
-                        </div>
-                    </div>
-                    <button onClick={handleCheckout} className="bg-dark-bg text-white w-full max-w-[600px] py-[1.6rem] text-[1.8rem] font-medium hover:bg-primary-900 transition-colors uppercase">FINALIZAR COMPRA</button>
-                </section>
-            )}
+                    )}
+
+                </div>
+            </main>
+
         </div>
     );
 }

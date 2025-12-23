@@ -38,8 +38,12 @@ const shopControllers = {
 
   // Cart: Add
   addToCart: asyncHandler(async (req, res) => {
+    console.log('🛒 [addToCart Controller] Request received');
+    console.log('  User ID:', req.user?.id);
+    console.log('  Body:', req.body);
     const { product_id, quantity } = req.body;
     await cartService.addToCart(req.user.id, product_id, quantity);
+    console.log('  ✅ Product added successfully');
     res.json({ success: true, message: 'Producto agregado al carrito' });
   }),
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import SearchInput from '@/components/ui/SearchInput';
+import { cn } from '@/utils/cn';
+import { FaSearch, FaFilter } from 'react-icons/fa';
 
 interface ShopSidebarProps {
     search: string;
@@ -28,63 +29,68 @@ export default function ShopSidebar({
     filterSpecial, setFilterSpecial
 }: ShopSidebarProps) {
     return (
-        <aside className="w-full md:w-[250px] shrink-0 space-y-[4rem]">
+        <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-10 bg-dark-surface p-8 rounded-2xl border border-white/5 h-fit">
+            <div className="flex items-center gap-2 text-primary border-b border-white/10 pb-4">
+                <FaFilter size={18} />
+                <h2 className="text-xl font-bold uppercase tracking-wider">Filters</h2>
+            </div>
+
             {/* Search */}
-            <div className="space-y-[1.2rem]">
-                <label className="text-[1.8rem] font-medium block" htmlFor="search">BUSCAR</label>
-                {/* Reusing SearchInput might need adaptation as it filters internally vs parent state */}
-                {/* For this specific Sidebar logic where parent controls everything: */}
-                <div className="relative">
+            <div className="flex flex-col gap-3">
+                <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Search</label>
+                <div className="relative group">
+                    <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors" />
                     <input
-                        className="w-full border-2 border-primary rounded-[50px] px-[1.6rem] py-[0.8rem] text-[1.6rem] placeholder:text-gray-400 focus:outline-none"
+                        className="w-full bg-dark-bg border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-gray-600"
                         type="text"
-                        name="buscar"
-                        placeholder="item o categoria"
+                        placeholder="Search products..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                    // onKeyDown dealt with by debounce usually or external
                     />
                 </div>
             </div>
 
             {/* Order */}
-            <div className="space-y-[1.2rem]">
-                <label className="text-[1.8rem] font-medium block" htmlFor="order">ORDENAR POR</label>
-                <select
-                    className="w-full border-2 border-primary rounded-[50px] px-[1.6rem] py-[0.8rem] text-[1.6rem] bg-white focus:outline-none cursor-pointer"
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
-                >
-                    <option value="">Defecto</option>
-                    <option value="price-ascending">Menor Precio</option>
-                    <option value="price-descending">Mayor Precio</option>
-                    <option value="alpha-ascending">A-Z</option>
-                    <option value="alpha-descending">Z-A</option>
-                </select>
+            <div className="flex flex-col gap-3">
+                <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Sort By</label>
+                <div className="relative">
+                    <select
+                        className="w-full appearance-none bg-dark-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary cursor-pointer hover:border-white/20 transition-colors"
+                        value={sort}
+                        onChange={(e) => setSort(e.target.value)}
+                    >
+                        <option value="">Default</option>
+                        <option value="price-ascending">Price: Low to High</option>
+                        <option value="price-descending">Price: High to Low</option>
+                        <option value="alpha-ascending">Name: A-Z</option>
+                        <option value="alpha-descending">Name: Z-A</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 text-xs">▼</div>
+                </div>
             </div>
 
             {/* Price */}
-            <div className="space-y-[1.2rem]">
-                <label className="text-[1.8rem] font-medium block" htmlFor="price">PRECIO</label>
-                <div className="flex items-center gap-4 justify-between">
-                    <div className="flex items-center gap-2">
-                        <span className="text-[1.4rem]">MIN</span>
+            <div className="flex flex-col gap-4">
+                <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Price Range</label>
+                <div className="flex items-center gap-3">
+                    <div className="relative flex-1">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">$</span>
                         <input
-                            className="w-[7rem] border border-gray-300 rounded px-2 py-1 text-[1.4rem]"
+                            className="w-full bg-dark-bg border border-white/10 rounded-lg pl-6 pr-2 py-2 text-sm text-white focus:outline-none focus:border-primary transition-all text-center"
                             type="number"
-                            placeholder="0"
+                            placeholder="Min"
                             min="0"
                             value={minPrice}
                             onChange={(e) => setMinPrice(e.target.value)}
                         />
                     </div>
-                    <span className="text-[1.4rem]">-</span>
-                    <div className="flex items-center gap-2">
-                        <span className="text-[1.4rem]">MAX</span>
+                    <span className="text-gray-500">-</span>
+                    <div className="relative flex-1">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">$</span>
                         <input
-                            className="w-[7rem] border border-gray-300 rounded px-2 py-1 text-[1.4rem]"
+                            className="w-full bg-dark-bg border border-white/10 rounded-lg pl-6 pr-2 py-2 text-sm text-white focus:outline-none focus:border-primary transition-all text-center"
                             type="number"
-                            placeholder="0"
+                            placeholder="Max"
                             min="0"
                             value={maxPrice}
                             onChange={(e) => setMaxPrice(e.target.value)}
@@ -94,38 +100,49 @@ export default function ShopSidebar({
             </div>
 
             {/* Filter */}
-            <div className="space-y-[1.2rem]">
-                <label className="text-[1.8rem] font-medium block" htmlFor="filter">FILTRAR</label>
-                <div className="space-y-[0.8rem]">
-                    <div className="flex items-center gap-[0.8rem]">
-                        <input
-                            type="checkbox"
-                            className="w-[1.8rem] h-[1.8rem] accent-primary cursor-pointer"
-                            checked={filterNew}
-                            onChange={(e) => setFilterNew(e.target.checked)}
-                        />
-                        <label className="text-[1.6rem]">NUEVOS</label>
-                    </div>
-                    <div className="flex items-center gap-[0.8rem]">
-                        <input
-                            type="checkbox"
-                            className="w-[1.8rem] h-[1.8rem] accent-primary cursor-pointer"
-                            checked={filterOffers}
-                            onChange={(e) => setFilterOffers(e.target.checked)}
-                        />
-                        <label className="text-[1.6rem]">OFERTAS</label>
-                    </div>
-                    <div className="flex items-center gap-[0.8rem]">
-                        <input
-                            type="checkbox"
-                            className="w-[1.8rem] h-[1.8rem] accent-primary cursor-pointer"
-                            checked={filterSpecial}
-                            onChange={(e) => setFilterSpecial(e.target.checked)}
-                        />
-                        <label className="text-[1.6rem]">EDICIÓN ESPECIAL</label>
-                    </div>
+            <div className="flex flex-col gap-4">
+                <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Categories</label>
+                <div className="flex flex-col gap-3">
+                    <label className="flex items-center gap-3 cursor-pointer group hover:bg-white/5 p-2 rounded-lg transition-colors -mx-2">
+                        <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", filterNew ? "bg-primary border-primary" : "border-gray-600 bg-transparent group-hover:border-primary")}>
+                            {filterNew && <span className="text-white text-xs">✓</span>}
+                        </div>
+                        <input type="checkbox" className="hidden" checked={filterNew} onChange={(e) => setFilterNew(e.target.checked)} />
+                        <span className={cn("text-sm transition-colors", filterNew ? "text-white font-medium" : "text-gray-400 group-hover:text-white")}>New Arrivals</span>
+                    </label>
+
+                    <label className="flex items-center gap-3 cursor-pointer group hover:bg-white/5 p-2 rounded-lg transition-colors -mx-2">
+                        <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", filterOffers ? "bg-primary border-primary" : "border-gray-600 bg-transparent group-hover:border-primary")}>
+                            {filterOffers && <span className="text-white text-xs">✓</span>}
+                        </div>
+                        <input type="checkbox" className="hidden" checked={filterOffers} onChange={(e) => setFilterOffers(e.target.checked)} />
+                        <span className={cn("text-sm transition-colors", filterOffers ? "text-white font-medium" : "text-gray-400 group-hover:text-white")}>Special Offers</span>
+                    </label>
+
+                    <label className="flex items-center gap-3 cursor-pointer group hover:bg-white/5 p-2 rounded-lg transition-colors -mx-2">
+                        <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", filterSpecial ? "bg-primary border-primary" : "border-gray-600 bg-transparent group-hover:border-primary")}>
+                            {filterSpecial && <span className="text-white text-xs">✓</span>}
+                        </div>
+                        <input type="checkbox" className="hidden" checked={filterSpecial} onChange={(e) => setFilterSpecial(e.target.checked)} />
+                        <span className={cn("text-sm transition-colors", filterSpecial ? "text-white font-medium" : "text-gray-400 group-hover:text-white")}>Limited Edition</span>
+                    </label>
                 </div>
             </div>
+
+            <button
+                onClick={() => {
+                    setSearch("");
+                    setSort("");
+                    setMinPrice("");
+                    setMaxPrice("");
+                    setFilterNew(false);
+                    setFilterOffers(false);
+                    setFilterSpecial(false);
+                }}
+                className="mt-4 text-xs font-bold text-gray-500 hover:text-white underline uppercase tracking-widest transition-colors self-center"
+            >
+                Clear All Filters
+            </button>
         </aside>
     );
 }

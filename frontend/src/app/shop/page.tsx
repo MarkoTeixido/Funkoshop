@@ -42,47 +42,68 @@ export default function Shop() {
     }, [fetchProducts, debouncedSearch, sort, minPrice, maxPrice, filterNew, filterOffers, filterSpecial]);
 
     return (
-        <div className="standard-container py-[4rem] flex flex-col md:flex-row gap-[4rem] text-dark">
-            <ShopSidebar
-                search={search} setSearch={setSearch}
-                sort={sort} setSort={setSort}
-                minPrice={minPrice} setMinPrice={setMinPrice}
-                maxPrice={maxPrice} setMaxPrice={setMaxPrice}
-                filterNew={filterNew} setFilterNew={setFilterNew}
-                filterOffers={filterOffers} setFilterOffers={setFilterOffers}
-                filterSpecial={filterSpecial} setFilterSpecial={setFilterSpecial}
-            />
+        <div className="bg-dark-bg min-h-screen">
+            <div className="container-custom pt-32 pb-12 flex flex-col md:flex-row gap-12">
+                <ShopSidebar
+                    search={search} setSearch={setSearch}
+                    sort={sort} setSort={setSort}
+                    minPrice={minPrice} setMinPrice={setMinPrice}
+                    maxPrice={maxPrice} setMaxPrice={setMaxPrice}
+                    filterNew={filterNew} setFilterNew={setFilterNew}
+                    filterOffers={filterOffers} setFilterOffers={setFilterOffers}
+                    filterSpecial={filterSpecial} setFilterSpecial={setFilterSpecial}
+                />
 
-            <div className="flex-1">
-                {loading ? (
-                    <Loader />
-                ) : products.length === 0 ? (
-                    <div className="text-center text-[2rem] py-10">No se encontraron productos.</div>
-                ) : (
-                    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[2.4rem] mb-[4rem]">
-                        {products.map((p) => (
-                            <ProductCard
-                                key={p.product_id}
-                                id={p.product_id}
-                                category={(p as any).Licence ? (p as any).Licence.licence_name : 'GENERIC'}
-                                name={p.product_name}
-                                price={p.price}
-                                imageFront={p.image_front || '/placeholder.png'}
-                                imageBack={p.image_back || '/placeholder.png'}
-                                tag={(p.discount !== null && p.discount > 0) ? `${p.discount}% OFF` : 'NUEVO'}
-                                installments={p.dues ? `${p.dues} CUOTAS SIN INTERÉS` : undefined}
-                                stock={p.stock}
-                            />
-                        ))}
-                    </section>
-                )}
+                <div className="flex-1">
+                    {/* Header for Shop Grid */}
+                    <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
+                        <h2 className="text-3xl font-black text-white italic uppercase">All Products <span className="text-primary text-xl ml-1">({products.length})</span></h2>
+                        <div className="hidden md:flex items-center gap-2 text-gray-400 text-sm">
+                            Showing <span className="text-white font-bold">{products.length}</span> results
+                        </div>
+                    </div>
 
-                {/* Pagination (Visual only for now) */}
-                <div className="flex justify-center items-center gap-[0.8rem] py-[4rem] text-[1.6rem]">
-                    <a href="#" className="p-2 hover:text-primary transition-colors"><FaAngleLeft size={20} /></a>
-                    <a href="#" className="w-[3.2rem] h-[3.2rem] flex items-center justify-center border border-gray-300 rounded-[4px] bg-primary text-white font-medium">1</a>
-                    <a href="#" className="w-[3.2rem] h-[3.2rem] flex items-center justify-center border border-gray-300 rounded-[4px] hover:bg-primary-900 hover:text-white transition-colors font-medium">2</a>
-                    <a href="#" className="p-2 hover:text-primary transition-colors"><FaAngleRight size={20} /></a>
+                    {loading ? (
+                        <div className="flex justify-center py-20">
+                            <Loader />
+                        </div>
+                    ) : products.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-white/10 rounded-2xl bg-white/5 p-12">
+                            <p className="text-2xl font-bold text-white mb-2">No products found</p>
+                            <p className="text-gray-400">Try adjusting your filters</p>
+                        </div>
+                    ) : (
+                        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-12">
+                            {products.map((p) => (
+                                <ProductCard
+                                    key={p.product_id}
+                                    id={p.product_id}
+                                    category={(p as any).Licence ? (p as any).Licence.licence_name : 'GENERIC'}
+                                    name={p.product_name}
+                                    price={p.price}
+                                    imageFront={p.image_front || 'https://res.cloudinary.com/dp7jr9k94/image/upload/v1703182285/ironman_front_placeholder.png'}
+                                    imageBack={p.image_back || 'https://res.cloudinary.com/dp7jr9k94/image/upload/v1703182285/ironman_box_placeholder.png'}
+                                    tag={(p.discount !== null && p.discount > 0) ? `${p.discount}% OFF` : 'NUEVO'}
+                                    installments={p.dues ? `${p.dues} CUOTAS SIN INTERÉS` : undefined}
+                                    stock={p.stock}
+                                />
+                            ))}
+                        </section>
+                    )}
+
+                    {/* Pagination (Visual only for now) */}
+                    <div className="flex justify-center items-center gap-4 py-8">
+                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-dark-surface border border-white/10 text-white hover:bg-primary hover:border-primary transition-all">
+                            <FaAngleLeft />
+                        </button>
+                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold shadow-lg shadow-primary/20">1</button>
+                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-dark-surface border border-white/10 text-white hover:bg-white/10 transition-all font-medium">2</button>
+                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-dark-surface border border-white/10 text-white hover:bg-white/10 transition-all font-medium">3</button>
+                        <span className="text-gray-500">...</span>
+                        <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-dark-surface border border-white/10 text-white hover:bg-primary hover:border-primary transition-all">
+                            <FaAngleRight />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

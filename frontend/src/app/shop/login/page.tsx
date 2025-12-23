@@ -1,96 +1,152 @@
 "use client";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext'; // Creating this file first if not exists, but likely exists based on previous logs
+import { FaEnvelope, FaLock, FaArrowRight, FaUserShield, FaUser } from "react-icons/fa6";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
-import Link from "next/link";
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { authService } from "@/services/auth.service";
+import { authService } from '@/services/auth.service';
 
-export default function Login() {
+export default function LoginPage() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const { login } = useAuth();
-    const [formData, setFormData] = useState({ email: "", password: "" });
-    const [error, setError] = useState("");
+    const router = useRouter();
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(""); // Clear previous errors
+    const performLogin = async (e?: React.FormEvent, creds?: { email: string, password: string }) => {
+        if (e) e.preventDefault();
+        const loginEmail = creds ? creds.email : email;
+        const loginPass = creds ? creds.password : password;
+
+        setError('');
+        setLoading(true);
         try {
-            const data = await authService.login(formData.email, formData.password);
-            // login function from context updates state and redirects
-            login(data.token, data.user);
+            const response = await authService.login(loginEmail, loginPass);
+            if (response.token && response.user) {
+                login(response.token, response.user);
+            } else {
+                setError("Respuesta inválida del servidor");
+            }
         } catch (err: any) {
             console.error(err);
-            // Setup robust error from service (standardized in api layer ideally)
-            // If service throws generic error, display it
-            setError(err.response?.data?.message || err.message || "Error al iniciar sesión");
+            setError(err.response?.data?.message || err.message || 'Error al iniciar sesión');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleExampleUser = () => {
-        setFormData({ email: "juan@ejemplo.com", password: "Contraseña1." });
+    const handleTestLogin = (role: 'admin' | 'user') => {
+        const creds = role === 'admin'
+            ? { email: 'admin@funkoshop.com', password: '123456' }
+            : { email: 'cliente@funkoshop.com', password: '123456' };
+
+        setEmail(creds.email);
+        setPassword(creds.password);
+        performLogin(undefined, creds);
     };
 
     return (
-        <div className="standard-container py-[8rem] flex justify-center items-center">
-            <form onSubmit={handleSubmit} className="w-full max-w-[500px] flex flex-col gap-[2.4rem]">
-                <h2 className="text-[3.8rem] font-bold text-center uppercase font-raleway mb-2">Ingresar a mi cuenta</h2>
+        <div className="bg-dark-bg min-h-screen flex flex-col">
+            {/* Optional: Include Header if desired, or keep auth pages clean */}
+            {/* <Header /> */}
 
-                <button
-                    type="button"
-                    onClick={handleExampleUser}
-                    className="self-center text-[1.4rem] text-blue-500 hover:text-blue-700 font-medium underline mb-4"
-                >
-                    Usar usuario de ejemplo
-                </button>
+            <main className="flex-grow flex items-center justify-center p-4 pt-25 relative overflow-hidden">
+                {/* Background Blobs */}
+                <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                        <strong className="font-bold">Error: </strong>
-                        <span className="block sm:inline">{error}</span>
+                <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-8 md:p-12 rounded-3xl shadow-2xl relative z-10">
+                    <div className="text-center mb-10">
+                        <h1 className="text-4xl font-black italic uppercase text-white mb-2">Welcome Back</h1>
+                        <p className="text-gray-400">Enter your credentials to access your account.</p>
                     </div>
-                )}
 
-                <div className="flex flex-col gap-[1rem]">
-                    <label className="text-[1.8rem] font-medium" htmlFor="email">Email</label>
-                    <input
-                        className="border-b-2 border-primary py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400"
-                        type="email"
-                        id="email"
-                        placeholder="johndoe@correo.com"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        required
-                    />
-                </div>
-                <div className="flex flex-col gap-[1rem]">
-                    <label className="text-[1.8rem] font-medium" htmlFor="password">Contraseña</label>
-                    <input
-                        className="border-b-2 border-primary py-[0.8rem] text-[1.6rem] outline-none placeholder:text-gray-400"
-                        type="password"
-                        id="password"
-                        placeholder="•••••••••"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        required
-                    />
-                </div>
-                <div className="flex items-center gap-[1rem]">
-                    <button type="submit" className="bg-dark-bg text-white px-[3.2rem] py-[1.2rem] text-[1.6rem] font-medium hover:bg-primary-900 transition-colors uppercase">Ingresar</button>
-                    <div className="flex items-center gap-2">
-                        <input type="checkbox" id="remember" className="size-5 accent-primary" />
-                        <label htmlFor="remember" className="text-[1.6rem]">Recordarme</label>
+                    {error && (
+                        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-sm font-bold text-center">
+                            {error}
+                        </div>
+                    )}
+
+                    <form onSubmit={(e) => performLogin(e)} className="space-y-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">Email</label>
+                            <div className="relative group">
+                                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" />
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                    placeholder="name@example.com"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">Password</label>
+                            <div className="relative group">
+                                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" />
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end">
+                            <Link href="/shop/forgot-password" className="text-xs text-gray-400 hover:text-white transition-colors">
+                                Forgot Password?
+                            </Link>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed group"
+                        >
+                            {loading ? 'Logging in...' : 'Sign In'}
+                            {!loading && <FaArrowRight className="group-hover:translate-x-1 transition-transform" />}
+                        </button>
+                    </form>
+
+                    {/* Test Accounts */}
+                    <div className="mt-8 pt-8 border-t border-white/10">
+                        <p className="text-center text-xs text-gray-500 uppercase tracking-widest mb-4">Quick Login (Test Mode)</p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <button
+                                type="button"
+                                onClick={() => handleTestLogin('admin')}
+                                className="flex flex-col items-center justify-center gap-2 p-3 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-xl transition-all group"
+                            >
+                                <FaUserShield className="text-primary group-hover:scale-110 transition-transform" size={20} />
+                                <span className="text-xs font-bold text-gray-300">Admin</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleTestLogin('user')}
+                                className="flex flex-col items-center justify-center gap-2 p-3 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-xl transition-all group"
+                            >
+                                <FaUser className="text-blue-500 group-hover:scale-110 transition-transform" size={20} />
+                                <span className="text-xs font-bold text-gray-300">User</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <Link href="#" className="text-[1.4rem] text-blue-500 hover:underline">Olvidé mi contraseña</Link>
-                <div className="text-[1.4rem] text-center mt-4">
-                    ¿No tienes una cuenta? <Link href="/shop/register" className="text-primary font-bold hover:underline">Regístrate</Link>
-                </div>
 
-                <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-                    <Link href="/admin/login" className="inline-block px-6 py-2 border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white transition-colors rounded-full text-[1.4rem]">
-                        ¿Quieres probar el modulo admin?
-                    </Link>
+                    <p className="text-center text-gray-400 mt-8 text-sm">
+                        Don't have an account? <Link href="/shop/register" className="text-white font-bold hover:underline decoration-primary underline-offset-4">Sign Up</Link>
+                    </p>
                 </div>
-            </form>
+            </main>
+            {/* <Footer /> */}
         </div>
     );
 }

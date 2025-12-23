@@ -22,8 +22,8 @@ export default function ProductSlider({ title, products }: ProductSliderProps) {
     return (
         <div className="product-slider-container relative">
             {title && (
-                <h2 className="text-[3.2rem] font-bold uppercase text-dark mb-[3rem] ml-4 md:ml-0 font-raleway">
-                    {title}
+                <h2 className="text-3xl md:text-4xl font-black uppercase text-white mb-8 ml-4 md:ml-0 font-raleway tracking-wider">
+                    {title} <span className="text-primary">.</span>
                 </h2>
             )}
             <Swiper
@@ -39,8 +39,11 @@ export default function ProductSlider({ title, products }: ProductSliderProps) {
                     640: {
                         slidesPerView: 2,
                     },
-                    1000: {
-                        slidesPerView: 3,
+                    1024: {
+                        slidesPerView: 4,
+                    },
+                    1280: {
+                        slidesPerView: 5,
                     },
                 }}
                 className="pb-8"
@@ -53,17 +56,18 @@ export default function ProductSlider({ title, products }: ProductSliderProps) {
             </Swiper>
 
             {/* Custom Navigation Buttons */}
+            {/* Custom Navigation Buttons */}
             <button
                 ref={(node) => setPrevEl(node)}
-                className="swiper-button-prev-custom absolute top-1/2 -left-4 md:-left-6 z-10 -translate-y-1/2 w-12 h-12 bg-white/30 backdrop-blur-sm border border-white/50 rounded-lg shadow-sm flex items-center justify-center text-gray-600 cursor-pointer hover:bg-white/80 hover:text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="swiper-button-prev-custom absolute top-1/2 -left-4 md:-left-8 z-20 -translate-y-1/2 w-12 h-12 bg-dark-bg/50 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-primary hover:border-primary transition-all disabled:opacity-0 disabled:cursor-not-allowed group"
             >
-                <RxChevronLeft size={28} />
+                <RxChevronLeft size={24} className="group-hover:scale-110 transition-transform" />
             </button>
             <button
                 ref={(node) => setNextEl(node)}
-                className="swiper-button-next-custom absolute top-1/2 -right-4 md:-right-6 z-10 -translate-y-1/2 w-12 h-12 bg-white/30 backdrop-blur-sm border border-white/50 rounded-lg shadow-sm flex items-center justify-center text-gray-600 cursor-pointer hover:bg-white/80 hover:text-gray-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="swiper-button-next-custom absolute top-1/2 -right-4 md:-right-8 z-20 -translate-y-1/2 w-12 h-12 bg-dark-bg/50 backdrop-blur-md border border-white/10 rounded-full flex items-center justify-center text-white cursor-pointer hover:bg-primary hover:border-primary transition-all disabled:opacity-0 disabled:cursor-not-allowed group"
             >
-                <RxChevronRight size={28} />
+                <RxChevronRight size={24} className="group-hover:scale-110 transition-transform" />
             </button>
         </div>
     );

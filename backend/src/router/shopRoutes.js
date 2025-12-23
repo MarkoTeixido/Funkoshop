@@ -7,8 +7,20 @@ const { body } = require('express-validator');
 
 // Validation Chains
 const cartAddValidation = [
-    body('product_id').isInt().withMessage('ID de producto inválido'),
-    body('quantity').isInt({ min: 1 }).withMessage('La cantidad debe ser mayor a 0'),
+    body('product_id').custom((value) => {
+        const num = parseInt(value);
+        if (isNaN(num) || num < 1) {
+            throw new Error('ID de producto inválido');
+        }
+        return true;
+    }),
+    body('quantity').custom((value) => {
+        const num = parseInt(value);
+        if (isNaN(num) || num < 1) {
+            throw new Error('La cantidad debe ser mayor a 0');
+        }
+        return true;
+    }),
     validateRequest
 ];
 

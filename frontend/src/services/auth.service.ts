@@ -5,11 +5,13 @@ import { LoginResponse, RegisterDTO, User } from '@/types/auth.types';
 export const authService = {
     login: async (email: string, password: string): Promise<LoginResponse> => {
         const response = await api.post<LoginResponse>('/auth/login', { email, password });
-        if (response.data.token) {
-            authUtils.setToken(response.data.token);
-            authUtils.setUser(response.data.user);
+        const data = response.data;
+
+        if (data.token) {
+            authUtils.setToken(data.token);
+            authUtils.setUser(data.user);
         }
-        return response.data;
+        return data;
     },
 
     register: async (data: RegisterDTO): Promise<LoginResponse> => {
