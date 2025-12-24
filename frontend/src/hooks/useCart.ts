@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { cartService } from '@/services/cart.service';
-import Swal from 'sweetalert2';
+import { useToast } from '@/context/ToastContext';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Product } from '@/types/product.types';
@@ -18,6 +18,7 @@ export function useCart() {
     const [error, setError] = useState<string | null>(null);
     const { isAuthenticated } = useAuth();
     const router = useRouter();
+    const toast = useToast();
 
     const fetchCart = useCallback(async () => {
         if (!isAuthenticated) return;
@@ -45,32 +46,24 @@ export function useCart() {
         try {
             await cartService.addToCart(productId, quantity);
 
-            Swal.fire({
-                title: '¡Producto agregado!',
-                text: 'El producto se agregó al carrito correctamente.',
-                icon: 'success',
-                showCancelButton: true,
-                confirmButtonColor: '#ff3333',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ir al carrito',
-                cancelButtonText: 'Seguir comprando'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    router.push('/shop/cart');
-                    fetchCart(); // Refresh if we were on cart page (unlikely but safe)
+            toast.success(
+                '¡Producto agregado!',
+                'Tu nuevo coleccionable está en el carrito.',
+                {
+                    label: 'Ir al Carrito',
+                    onClick: () => {
+                        router.push('/shop/cart');
+                        fetchCart();
+                    }
                 }
-            });
+            );
 
         } catch (err: any) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: err.message || 'Error al agregar al carrito'
-            });
+            toast.error('Error', err.message || 'Error al agregar al carrito');
         } finally {
             setLoading(false);
         }
-    }, [isAuthenticated, router, fetchCart]);
+    }, [isAuthenticated, router, fetchCart, toast]);
 
     const updateQuantity = useCallback(async (productId: number, newQuantity: number) => {
         if (newQuantity < 1) return;

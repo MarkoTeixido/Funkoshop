@@ -1,6 +1,8 @@
 const dashboardService = require('../services/service_dashboard');
 const productService = require('../services/service_product');
 const orderService = require('../services/service_order');
+const categoryService = require('../services/service_category');
+const licenceService = require('../services/service_licence');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const { HTTP_CODES, MESSAGES } = require('../utils/constants');
@@ -85,6 +87,18 @@ const adminControllers = {
         }
 
         res.json({ success: true, message: 'Producto eliminado' });
+    }),
+
+    // Get Categories
+    getCategories: asyncHandler(async (req, res) => {
+        const categories = await categoryService.getAllCategory();
+        res.json(categories);
+    }),
+
+    // Get Licences
+    getLicences: asyncHandler(async (req, res) => {
+        const licences = await licenceService.getAllLicence();
+        res.json(licences);
     })
 };
 

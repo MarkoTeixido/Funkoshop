@@ -5,13 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa6";
 import { useAdminAuth } from "@/context/AdminAuthContext";
-import Swal from "sweetalert2";
+import { useToast } from "@/context/ToastContext";
 
 export default function EditProduct({ params }: { params: Promise<{ product_id: string }> }) {
     const { product_id } = use(params);
     const router = useRouter();
     const { token } = useAdminAuth();
+    const toast = useToast();
     const [loading, setLoading] = useState(true);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [licences, setLicences] = useState<any[]>([]);
     const [formData, setFormData] = useState({
         category_id: '',
         licence_id: '',
@@ -29,35 +32,48 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
     useEffect(() => {
         if (!token) return;
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products/${product_id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-            .then(res => {
-                if (!res.ok) throw new Error("Error fetching product");
-                return res.json();
-            })
-            .then(data => {
+        const fetchData = async () => {
+            try {
+                const [productRes, catRes, licRes] = await Promise.all([
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/products/${product_id}`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/categories`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/licences`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+
+                if (!productRes.ok) throw new Error("Error fetching product");
+
+                const productData = await productRes.json();
+                const categoriesData = catRes.ok ? await catRes.json() : [];
+                const licencesData = licRes.ok ? await licRes.json() : [];
+
+                setCategories(categoriesData);
+                setLicences(licencesData);
+
+                console.log('Fetched Product Data:', productData); // DEBUG
+
                 setFormData({
-                    category_id: data.category_id || '',
-                    licence_id: data.licence_id || '',
-                    product_name: data.product_name || '',
-                    product_description: data.product_description || '',
-                    sku: data.sku || '',
-                    price: data.price || '',
-                    stock: data.stock || '',
-                    discount: data.discount || '',
-                    dues: data.dues || '',
-                    image_front: data.image_front || '',
-                    image_back: data.image_back || ''
+                    category_id: productData.category_id || '',
+                    licence_id: productData.licence_id || '',
+                    product_name: productData.product_name || '',
+                    product_description: productData.product_description || '',
+                    sku: productData.sku || '',
+                    price: productData.price ? String(productData.price) : '',
+                    stock: productData.stock ? String(productData.stock) : '',
+                    discount: productData.discount ? String(productData.discount) : '',
+                    dues: productData.dues ? String(productData.dues) : '',
+                    image_front: productData.image_front || '',
+                    image_back: productData.image_back || ''
                 });
                 setLoading(false);
-            })
-            .catch(err => {
+            } catch (err) {
                 console.error(err);
-                Swal.fire('Error', 'No se pudo cargar el producto', 'error');
+                toast.error('Error', 'No se pudo cargar la información del producto');
                 router.push('/admin/dashboard');
-            });
-    }, [product_id, token, router]);
+            }
+        };
+
+        fetchData();
+    }, [product_id, token, router, toast]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -77,15 +93,17 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
             const data = await res.json();
 
             if (res.ok) {
-                Swal.fire('Actualizado!', 'El producto ha sido actualizado exitosamente', 'success').then(() => {
-                    router.push('/admin/dashboard');
+                toast.success('Actualizado!', 'El producto ha sido actualizado exitosamente', {
+                    label: 'Volver',
+                    onClick: () => router.push('/admin/dashboard')
                 });
+                setTimeout(() => router.push('/admin/dashboard'), 1500);
             } else {
-                Swal.fire('Error', data.error || 'Error al actualizar producto', 'error');
+                toast.error('Error', data.error || 'Error al actualizar producto');
             }
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', 'Error de conexión', 'error');
+            toast.error('Error', 'Error de conexión');
         }
     };
 
@@ -142,7 +160,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                         name="product_name"
                                         value={formData.product_name}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
+                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -153,7 +171,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                         type="text"
                                         value={formData.sku}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 font-mono"
+                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 font-mono"
                                     />
                                 </div>
                             </div>
@@ -167,7 +185,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                     onChange={handleChange}
                                     rows={6}
                                     placeholder="Detailed description of the product..."
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 resize-none"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 resize-none"
                                 ></textarea>
                             </div>
                         </div>
@@ -188,7 +206,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                     name="image_front"
                                     value={formData.image_front}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
                                 />
                             </div>
                             <div className="space-y-1.5">
@@ -199,7 +217,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                     name="image_back"
                                     value={formData.image_back}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
                                 />
                             </div>
 
@@ -239,11 +257,14 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                     name="category_id"
                                     value={formData.category_id}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
                                 >
                                     <option value="">Select Category</option>
-                                    <option value="1">Figuras</option>
-                                    <option value="2">Remeras</option>
+                                    {categories.map((cat: any) => (
+                                        <option key={cat.category_id} value={cat.category_id}>
+                                            {cat.category_name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="space-y-1.5">
@@ -253,12 +274,14 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                     name="licence_id"
                                     value={formData.licence_id}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
                                 >
                                     <option value="">Select License</option>
-                                    <option value="1">Star Wars</option>
-                                    <option value="2">Pokemon</option>
-                                    <option value="3">Harry Potter</option>
+                                    {licences.map((lic: any) => (
+                                        <option key={lic.licence_id} value={lic.licence_id}>
+                                            {lic.licence_name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
@@ -276,7 +299,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                     type="number"
                                     value={formData.price}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -288,7 +311,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                         type="number"
                                         value={formData.stock}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
+                                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -299,7 +322,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                         type="number"
                                         value={formData.discount}
                                         onChange={handleChange}
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
+                                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
                                     />
                                 </div>
                             </div>
@@ -310,7 +333,7 @@ export default function EditProduct({ params }: { params: Promise<{ product_id: 
                                     name="dues"
                                     value={formData.dues}
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
                                 >
                                     <option value="">Select Option</option>
                                     <option value="3">3 Cuotas sin interés</option>

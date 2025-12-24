@@ -90,7 +90,7 @@ class CartService {
                 shipping_country: shippingData.country,
                 shipping_phone: shippingData.phone,
                 payment_method: 'credit_card',
-                status: 'processing'
+                status: 'pending'
             }, transaction);
 
             // Create Order Items & Deduct Stock

@@ -39,11 +39,8 @@ export default function LoginPage() {
         }
     };
 
-    const handleTestLogin = (role: 'admin' | 'user') => {
-        const creds = role === 'admin'
-            ? { email: 'admin@funkoshop.com', password: '123456' }
-            : { email: 'cliente@funkoshop.com', password: '123456' };
-
+    const handleTestUserLogin = () => {
+        const creds = { email: 'juan@ejemplo.com', password: 'Contraseña1.' };
         setEmail(creds.email);
         setPassword(creds.password);
         performLogin(undefined, creds);
@@ -122,17 +119,16 @@ export default function LoginPage() {
                     <div className="mt-8 pt-8 border-t border-white/10">
                         <p className="text-center text-xs text-gray-500 uppercase tracking-widest mb-4">Inicio Rápido (Modo Prueba)</p>
                         <div className="grid grid-cols-2 gap-4">
-                            <button
-                                type="button"
-                                onClick={() => handleTestLogin('admin')}
+                            <Link
+                                href="/admin/login"
                                 className="flex flex-col items-center justify-center gap-2 p-3 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-xl transition-all group"
                             >
                                 <FaUserShield className="text-primary group-hover:scale-110 transition-transform" size={20} />
                                 <span className="text-xs font-bold text-gray-300">Administrador</span>
-                            </button>
+                            </Link>
                             <button
                                 type="button"
-                                onClick={() => handleTestLogin('user')}
+                                onClick={handleTestUserLogin}
                                 className="flex flex-col items-center justify-center gap-2 p-3 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-xl transition-all group"
                             >
                                 <FaUser className="text-blue-500 group-hover:scale-110 transition-transform" size={20} />

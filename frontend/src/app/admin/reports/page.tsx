@@ -5,7 +5,7 @@ import {
     FaFilePdf, FaArrowDown, FaSackDollar, FaCartShopping,
     FaChartLine, FaUserGroup, FaCalendarDays
 } from "react-icons/fa6";
-import Swal from 'sweetalert2';
+import { useToast } from '@/context/ToastContext';
 import { api } from '@/services/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -67,6 +67,7 @@ const ChartCard = ({ title, children }: { title: string, children: React.ReactNo
 
 export default function AdminReports() {
     const { token } = useAdminAuth();
+    const toast = useToast();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState('all'); // 'month', 'year', 'all'
@@ -82,7 +83,7 @@ export default function AdminReports() {
                 setOrders(response.data);
             } catch (error) {
                 console.error("Failed to fetch orders", error);
-                Swal.fire('Error', 'Failed to load report data.', 'error');
+                toast.error('Error', 'Failed to load report data.');
             } finally {
                 setLoading(false);
             }

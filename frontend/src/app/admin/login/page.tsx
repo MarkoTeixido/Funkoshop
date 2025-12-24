@@ -15,7 +15,7 @@ export default function AdminLoginPage() {
 
     const handleExampleAdmin = () => {
         setEmail('admin@funkoshop.com');
-        setPassword('AdminPassword123!');
+        setPassword('Admin1.');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {

@@ -24,6 +24,8 @@ router.get('/activity', authChain, adminControllers.getActivity);
 router.get('/notifications', authChain, adminControllers.getNotifications);
 router.get('/reports', authChain, adminControllers.getReports);
 router.get('/orders', authChain, adminControllers.getOrders);
+router.get('/categories', authChain, adminControllers.getCategories);
+router.get('/licences', authChain, adminControllers.getLicences);
 
 router.post('/products', authChain, productValidation, adminControllers.createProduct);
 router.get('/products/:id', authChain, adminControllers.getProductById);

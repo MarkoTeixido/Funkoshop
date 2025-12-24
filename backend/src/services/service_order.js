@@ -30,6 +30,8 @@ class OrderService {
     }
 
     async getUserOrders(userId) {
+        // Auto-complete orders older than 24h
+        await orderRepository.updatePendingToCompleted(userId);
         return await orderRepository.findAllByUserId(userId);
     }
 }

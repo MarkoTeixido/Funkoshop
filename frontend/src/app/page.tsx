@@ -114,9 +114,9 @@ export default async function Home() {
                                 <Image src="https://res.cloudinary.com/dp7jr9k94/image/upload/v1766495580/Generated_Image_December_23_2025_-_10_11AM_u3pxvj.png" alt="Pokemon" fill className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-60 group-hover:opacity-40" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                                 <div className="absolute bottom-10 left-10">
-                                    <span className="text-secondary font-bold tracking-wider mb-2 block">POKEMON</span>
+                                    <span className="text-primary font-bold tracking-wider mb-2 block">POKÉMON</span>
                                     <h3 className="text-4xl font-black text-white italic uppercase mb-4">Atrápalos <br /> a Todos</h3>
-                                    <span className="text-white border-b-2 border-white pb-1 group-hover:border-secondary transition-colors">Comprar Ahora</span>
+                                    <span className="text-white border-b-2 border-white pb-1 group-hover:border-primary transition-colors">Comprar Ahora</span>
                                 </div>
                             </div>
                         </div>

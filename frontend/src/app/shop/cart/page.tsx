@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -19,8 +20,10 @@ export default function CartPage() {
     const shipping = subtotal > 50 ? 0 : 10;
     const tax = subtotal * 0.08; // 8% Tax Mockup
 
+    const router = useRouter();
+
     const handleCheckout = () => {
-        alert("Proceeding to checkout...");
+        router.push('/shop/checkout');
     };
 
     return (

@@ -52,6 +52,22 @@ class OrderRepository {
             order: [['created_at', 'DESC']]
         });
     }
+
+    async updatePendingToCompleted(userId) {
+        const cutoffDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
+        return await Order.update(
+            { status: 'completed' },
+            {
+                where: {
+                    user_id: userId,
+                    status: 'pending',
+                    created_at: {
+                        [sequelize.Sequelize.Op.lte]: cutoffDate
+                    }
+                }
+            }
+        );
+    }
 }
 
 module.exports = new OrderRepository();

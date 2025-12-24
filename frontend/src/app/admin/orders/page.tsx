@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { FaArrowLeft, FaEye, FaArrowDown, FaFilter, FaMagnifyingGlass } from "react-icons/fa6";
 import { useAdminAuth } from '@/context/AdminAuthContext';
-import Swal from 'sweetalert2';
+import { useToast } from "@/context/ToastContext";
 
 import { api } from '@/services/api';
 
@@ -26,6 +26,7 @@ interface Order {
 
 export default function OrdersPage() {
     const { token } = useAdminAuth();
+    const toast = useToast();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('all');
@@ -46,7 +47,7 @@ export default function OrdersPage() {
                 setOrders(response.data);
             } catch (error) {
                 console.error('Failed to fetch orders:', error);
-                Swal.fire('Error', 'Failed to load orders.', 'error');
+                toast.error('Error', 'Failed to load orders.');
             } finally {
                 setLoading(false);
             }

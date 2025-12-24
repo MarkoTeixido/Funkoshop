@@ -1,17 +1,20 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import Link from 'next/link';
-import Swal from 'sweetalert2';
+import { useToast } from "@/context/ToastContext";
 import { FaArrowLeft } from "react-icons/fa6";
 
 export default function CreateProduct() {
     const router = useRouter();
     const { token } = useAdminAuth();
+    const toast = useToast();
+    const [categories, setCategories] = useState<any[]>([]);
+    const [licences, setLicences] = useState<any[]>([]);
     const [formData, setFormData] = useState({
-        category: '',
-        licence: '',
+        category_id: '',
+        licence_id: '',
         product_name: '',
         product_description: '',
         sku: '',
@@ -22,6 +25,23 @@ export default function CreateProduct() {
         image_front: '',
         image_back: ''
     });
+
+    useEffect(() => {
+        if (!token) return;
+        const fetchData = async () => {
+            try {
+                const [catRes, licRes] = await Promise.all([
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/categories`, { headers: { 'Authorization': `Bearer ${token}` } }),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/licences`, { headers: { 'Authorization': `Bearer ${token}` } })
+                ]);
+                if (catRes.ok) setCategories(await catRes.json());
+                if (licRes.ok) setLicences(await licRes.json());
+            } catch (error) {
+                console.error("Failed to load options", error);
+            }
+        };
+        fetchData();
+    }, [token]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,15 +61,17 @@ export default function CreateProduct() {
             const data = await res.json();
 
             if (res.ok) {
-                Swal.fire('Creado!', 'El producto ha sido creado exitosamente', 'success').then(() => {
-                    router.push('/admin/dashboard');
+                toast.success('Creado!', 'El producto ha sido creado exitosamente', {
+                    label: 'Volver',
+                    onClick: () => router.push('/admin/dashboard')
                 });
+                setTimeout(() => router.push('/admin/dashboard'), 1500);
             } else {
-                Swal.fire('Error', data.error || 'Error al crear producto', 'error');
+                toast.error('Error', data.error || 'Error al crear producto');
             }
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', 'Error de conexión', 'error');
+            toast.error('Error', 'Error de conexión');
         }
     };
 
@@ -97,7 +119,7 @@ export default function CreateProduct() {
                                         id="product_name"
                                         onChange={handleChange}
                                         placeholder="e.g. Kakashi Hatake Figure"
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
+                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -108,7 +130,7 @@ export default function CreateProduct() {
                                         type="text"
                                         onChange={handleChange}
                                         placeholder="e.g. SSK111AB001"
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 font-mono"
+                                        className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 font-mono"
                                     />
                                 </div>
                             </div>
@@ -121,7 +143,7 @@ export default function CreateProduct() {
                                     onChange={handleChange}
                                     placeholder="Detailed description of the product..."
                                     rows={6}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 resize-none"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300 resize-none"
                                 ></textarea>
                             </div>
                         </div>
@@ -142,7 +164,7 @@ export default function CreateProduct() {
                                     id="image_front"
                                     onChange={handleChange}
                                     placeholder="https://..."
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
                                 />
                             </div>
                             <div className="space-y-1.5">
@@ -153,7 +175,7 @@ export default function CreateProduct() {
                                     id="image_back"
                                     onChange={handleChange}
                                     placeholder="https://..."
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-gray-300"
                                 />
                             </div>
                         </div>
@@ -167,30 +189,35 @@ export default function CreateProduct() {
                         <h2 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Organization</h2>
                         <div className="space-y-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-gray-500" htmlFor="category">Category</label>
+                                <label className="text-xs font-bold text-gray-500" htmlFor="category_id">Category</label>
                                 <select
-                                    id="category"
-                                    name="category"
+                                    id="category_id"
+                                    name="category_id"
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
                                 >
                                     <option value="">Select Category</option>
-                                    <option value="1">Figuras</option>
-                                    <option value="2">Remeras</option>
+                                    {categories.map((cat: any) => (
+                                        <option key={cat.category_id} value={cat.category_id}>
+                                            {cat.category_name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-gray-500" htmlFor="licence">License</label>
+                                <label className="text-xs font-bold text-gray-500" htmlFor="licence_id">License</label>
                                 <select
-                                    id="licence"
-                                    name="licence"
+                                    id="licence_id"
+                                    name="licence_id"
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
                                 >
                                     <option value="">Select License</option>
-                                    <option value="1">Star Wars</option>
-                                    <option value="2">Pokemon</option>
-                                    <option value="3">Harry Potter</option>
+                                    {licences.map((lic: any) => (
+                                        <option key={lic.licence_id} value={lic.licence_id}>
+                                            {lic.licence_name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
@@ -208,7 +235,7 @@ export default function CreateProduct() {
                                     type="number"
                                     onChange={handleChange}
                                     placeholder="0.00"
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -220,7 +247,7 @@ export default function CreateProduct() {
                                         type="number"
                                         onChange={handleChange}
                                         placeholder="0"
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
+                                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
                                     />
                                 </div>
                                 <div className="space-y-1.5">
@@ -231,7 +258,7 @@ export default function CreateProduct() {
                                         type="number"
                                         onChange={handleChange}
                                         placeholder="0"
-                                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
+                                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all"
                                     />
                                 </div>
                             </div>
@@ -241,7 +268,7 @@ export default function CreateProduct() {
                                     id="dues"
                                     name="dues"
                                     onChange={handleChange}
-                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
+                                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white text-gray-900 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all cursor-pointer"
                                 >
                                     <option value="">Select Option</option>
                                     <option value="3">3 Cuotas sin interes</option>
@@ -263,7 +290,7 @@ export default function CreateProduct() {
                         <button
                             type="button"
                             onClick={() => setFormData({
-                                category: '', licence: '', product_name: '', product_description: '',
+                                category_id: '', licence_id: '', product_name: '', product_description: '',
                                 sku: '', price: '', stock: '', discount: '', dues: '',
                                 image_front: '', image_back: ''
                             })}

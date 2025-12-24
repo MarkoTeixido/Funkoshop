@@ -8,6 +8,7 @@ export interface Product {
     discount_end_date: string | null; // ISO Date string
     is_featured: boolean;
     is_active: boolean;
+    is_new?: boolean;
     sku: string;
     dues: number | null;
     image_front: string;
