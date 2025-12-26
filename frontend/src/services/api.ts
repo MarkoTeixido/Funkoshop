@@ -74,14 +74,14 @@ api.interceptors.response.use(
             apiError.message = error.message;
         }
 
-        console.error('🔥 [API Error Debug]', JSON.stringify({
-            status: error.response?.status,
-            data: error.response?.data,
-            message: apiError.message,
-            rawError: error.toJSON ? error.toJSON() : error
-        }, null, 2));
+        // Log only in development
+        if (process.env.NODE_ENV === 'development') {
+            console.warn('🔥 [API Error]', apiError.status, '-', apiError.message);
+            if (apiError.errors) {
+                console.warn('Validation errors:', apiError.errors);
+            }
+        }
 
-        console.error('API Error:', apiError);
         return Promise.reject(apiError);
     }
 );

@@ -22,13 +22,14 @@ export function useAdminDashboard() {
     }, []);
 
     const deleteProduct = useCallback(async (id: number) => {
-        if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+        // Confirmation is now handled by the UI component
+
 
         try {
             await productService.delete(id);
             setProducts(prev => prev.filter(p => p.product_id !== id));
         } catch (err: any) {
-            alert(err.message || 'Error deleting product');
+            throw err;
         }
     }, []);
 

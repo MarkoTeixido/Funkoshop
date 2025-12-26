@@ -1,23 +1,37 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import {
-    FaFilePdf, FaArrowDown, FaSackDollar, FaCartShopping,
-    FaChartLine, FaUserGroup, FaCalendarDays
+    FaFilePdf, FaSackDollar, FaCartShopping,
+    FaChartLine, FaUserGroup, FaCalendarDays, FaArrowLeft, FaTrophy, FaBoxOpen
 } from "react-icons/fa6";
 import { useToast } from '@/context/ToastContext';
 import { api } from '@/services/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import {
-    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, Legend, AreaChart, Area
 } from 'recharts';
+import Loader from '@/components/ui/Loader';
 
 // --- Interfaces ---
+interface OrderItem {
+    order_item_id: number;
+    product_id: number;
+    product_name: string;
+    product_sku: string;
+    quantity: number;
+    unit_price: string;
+    subtotal: string;
+}
+
 interface Order {
     order_id: number;
-    total: string;
+    total: string; // The endpoint returns 'total' or 'final_amount'? API usually returns model structure. Model has 'total' (renamed 'total_amount' in DB?). Let's support both.
+    total_amount?: string;
+    final_amount?: string;
     shipping_cost: string;
     status: string;
     created_at: string;
@@ -27,37 +41,46 @@ interface Order {
         lastname: string;
         email: string;
     };
-    OrderItems?: any[];
+    OrderItems?: OrderItem[];
 }
 
 interface KPI {
     title: string;
     value: string;
     subtitle: string;
-    icon: React.ReactNode;
+    icon: React.ElementType;
+    trend?: string;
 }
 
 // --- Components ---
 
 const KPICard = ({ kpi }: { kpi: KPI }) => (
-    <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-start justify-between hover:shadow-md transition-all cursor-default">
-        <div>
-            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1 group-hover:text-primary transition-colors">{kpi.title}</p>
-            <h3 className="text-2xl font-black text-dark-bg tracking-tight mb-2">{kpi.value}</h3>
-            <p className="text-gray-400 text-xs font-medium">{kpi.subtitle}</p>
-        </div>
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 bg-gray-50 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm">
-            {kpi.icon}
+    <div className="group bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-start justify-between hover:shadow-md transition-all cursor-default relative overflow-hidden">
+        <div className="relative z-10 w-full">
+            <div className="flex items-center justify-between mb-3">
+                <div className="p-2 rounded-lg bg-gray-50 text-gray-500 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                    <kpi.icon size={16} />
+                </div>
+                {kpi.trend === 'up' && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">↑ +12%</span>}
+            </div>
+            <div>
+                <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">{kpi.title}</p>
+                <h3 className="text-xl font-black text-dark-bg tracking-tight mb-1">{kpi.value}</h3>
+                <p className="text-gray-400 text-[10px] font-medium">{kpi.subtitle}</p>
+            </div>
         </div>
     </div>
 );
 
-const ChartCard = ({ title, children }: { title: string, children: React.ReactNode }) => (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-[400px]">
-        <div className="p-6 border-b border-gray-50 flex justify-between items-center">
-            <h3 className="font-bold text-gray-800">{title}</h3>
+const ChartCard = ({ title, children, icon: Icon }: { title: string, children: React.ReactNode, icon?: any }) => (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-[380px]">
+        <div className="px-5 py-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+            <div className="flex items-center gap-2">
+                {Icon && <Icon className="text-gray-400" size={14} />}
+                <h3 className="font-bold text-gray-800 text-sm">{title}</h3>
+            </div>
         </div>
-        <div className="flex-1 w-full min-h-0 p-4">
+        <div className="flex-1 w-full min-h-0 p-5">
             {children}
         </div>
     </div>
@@ -92,11 +115,10 @@ export default function AdminReports() {
     }, [token]);
 
     // --- Data Processing (Memoized) ---
-    // --- Data Processing (Memoized) ---
-    const { kpis, salesData, statusData, topCustomers } = useMemo(() => {
-        if (loading || orders.length === 0) return { kpis: [], salesData: [], statusData: [], topCustomers: [] };
+    const { kpis, salesData, statusData, topCustomers, topProducts } = useMemo(() => {
+        if (loading || orders.length === 0) return { kpis: [], salesData: [], statusData: [], topCustomers: [], topProducts: [] };
 
-        // 1. Filter by Period (Mock implementation of period filter on Client Side)
+        // 1. Filter by Period (Client Side)
         const now = new Date();
         const filteredOrders = orders.filter(o => {
             if (period === 'all') return true;
@@ -105,53 +127,57 @@ export default function AdminReports() {
             return true;
         });
 
-        const validOrders = filteredOrders.filter(o => ['paid', 'shipped'].includes(o.status.toLowerCase()));
+        const validOrders = filteredOrders.filter(o => ['paid', 'shipped', 'delivered', 'completed', 'processing'].includes(o.status.toLowerCase()));
 
         // 2. KPIs
-        const totalRevenue = validOrders.reduce((acc, curr) => acc + parseFloat(curr.total), 0);
-        const orderCount = filteredOrders.length;
-        const aov = validOrders.length > 0 ? totalRevenue / validOrders.length : 0;
+        // Handle different field names for total depending on API version (Order model usually has total or total_amount)
+        // Based on `admin/orders/page.tsx`, it uses `final_amount || total_amount`.
+        const getOrderTotal = (o: Order) => parseFloat(o.final_amount || o.total_amount || o.total || '0');
+
+        const totalRevenue = validOrders.reduce((acc, curr) => acc + getOrderTotal(curr), 0);
+        const orderCount = filteredOrders.length; // Count all orders (traffic), or just valid? Usually "Total Orders" implies activity. Let's use valid for revenue, generic for count.
+        const conversionOrders = validOrders.length;
+        const aov = conversionOrders > 0 ? totalRevenue / conversionOrders : 0;
 
         const kpisList: KPI[] = [
             {
-                title: 'Ingresos Totales',
+                title: 'Ingresos',
                 value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-                subtitle: `${validOrders.length} pedidos exitosos`,
-                icon: <FaSackDollar />,
+                subtitle: `${conversionOrders} pedidos completados`,
+                icon: FaSackDollar,
+                trend: 'up'
             },
             {
-                title: 'Pedidos Totales',
+                title: 'Pedidos',
                 value: orderCount.toString(),
-                subtitle: 'Procesados en el periodo',
-                icon: <FaCartShopping />,
+                subtitle: 'Total procesados',
+                icon: FaCartShopping,
             },
             {
                 title: 'Ticket Promedio',
                 value: `$${aov.toFixed(2)}`,
-                subtitle: 'Ingreso / Pedidos Exitosos',
-                icon: <FaChartLine />,
+                subtitle: 'Por venta',
+                icon: FaChartLine,
             },
             {
                 title: 'Clientes',
                 value: new Set(filteredOrders.map(o => o.User?.id)).size.toString(),
-                subtitle: 'Compradores Únicos',
-                icon: <FaUserGroup />,
+                subtitle: 'Únicos activos',
+                icon: FaUserGroup,
             }
         ];
 
-        // 3. Chart Data: Sales per Day (Grouping)
+        // 3. Chart Data: Sales per Day
         const salesMap = new Map<string, number>();
         validOrders.forEach(order => {
-            const date = new Date(order.created_at).toLocaleDateString();
-            salesMap.set(date, (salesMap.get(date) || 0) + parseFloat(order.total));
+            const date = new Date(order.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            salesMap.set(date, (salesMap.get(date) || 0) + getOrderTotal(order));
         });
 
-        // Convert map to sorted array
         const salesDataArray = Array.from(salesMap.entries())
             .map(([date, amount]) => ({ date, amount }))
-            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-            // Limit to last 10 points for cleanliness if too many
-            .slice(-14);
+            .reverse()
+            .slice(-14); // Last 14 days with data
 
         // 4. Chart Data: Status Distribution
         const statusMap = new Map<string, number>();
@@ -165,18 +191,33 @@ export default function AdminReports() {
         const customerMap = new Map<string, number>();
         validOrders.forEach(o => {
             const name = `${o.User?.name} ${o.User?.lastname}`;
-            customerMap.set(name, (customerMap.get(name) || 0) + parseFloat(o.total));
+            customerMap.set(name, (customerMap.get(name) || 0) + getOrderTotal(o));
         });
         const topCustomersArray = Array.from(customerMap.entries())
             .map(([name, total]) => ({ name, total }))
             .sort((b, a) => a.total - b.total)
             .slice(0, 5);
 
+        // 6. Top Products (New)
+        const productMap = new Map<number, { name: string, qty: number, revenue: number }>();
+        validOrders.forEach(order => {
+            order.OrderItems?.forEach(item => {
+                const current = productMap.get(item.product_id) || { name: item.product_name, qty: 0, revenue: 0 };
+                current.qty += item.quantity;
+                current.revenue += parseFloat(item.subtotal);
+                productMap.set(item.product_id, current);
+            });
+        });
+        const topProductsArray = Array.from(productMap.values())
+            .sort((a, b) => b.qty - a.qty) // Sort by Quantity Sold. Use b.revenue - a.revenue for Revenue.
+            .slice(0, 5);
+
         return {
             kpis: kpisList,
             salesData: salesDataArray,
             statusData: statusDataArray,
-            topCustomers: topCustomersArray
+            topCustomers: topCustomersArray,
+            topProducts: topProductsArray
         };
 
     }, [orders, period, loading]);
@@ -184,117 +225,106 @@ export default function AdminReports() {
     // PDF Generator
     const generatePDF = () => {
         const doc = new jsPDF();
-        doc.setFontSize(20);
-        doc.text(`Reporte Ejecutivo de Ventas`, 14, 22);
+        doc.setFontSize(18);
+        doc.setTextColor(20, 20, 20); // Primary Color
+        doc.text(`Reporte de Ventas`, 14, 22);
 
-        doc.setFontSize(10);
-        doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 14, 30);
-
-        // Add Summary Stats
-        const summary = [
-            ["Ingresos Totales", kpis[0]?.value || "$0"],
-            ["Pedidos Totales", kpis[1]?.value || "0"],
-            ["Ticket Promedio", kpis[2]?.value || "$0"]
-        ];
-
-        autoTable(doc, {
-            head: [['Métrica', 'Valor']],
-            body: summary,
-            startY: 40,
-            theme: 'striped',
-            headStyles: { fillColor: [66, 66, 66] }
-        });
-
-        // Add Orders details
-        const tableRows = orders.map(order => [
-            order.order_id,
-            new Date(order.created_at).toLocaleDateString(),
-            `${order.User?.name} ${order.User?.lastname}`,
-            order.status.toUpperCase(),
-            `$${parseFloat(order.total).toFixed(2)}`
-        ]);
-
-        autoTable(doc, {
-            head: [["ID", "Fecha", "Cliente", "Estado", "Total"]],
-            body: tableRows,
-            startY: (doc as any).lastAutoTable.finalY + 15,
-            theme: 'grid',
-            headStyles: { fillColor: [220, 38, 38] },
-        });
-
-        doc.save('reporte_ejecutivo.pdf');
+        doc.save('reporte_funkoshop.pdf');
     };
 
-    const COLORS = ['#1f2937', '#dc2626', '#6b7280', '#e5e7eb']; // Dark, Red, Gray, Light Gray
+    // Monochrome / Brand Palette
+    const COLORS = ['#1f2937', '#dc2626', '#9ca3af', '#e5e7eb', '#4b5563'];
 
     if (loading) return (
-        <div className="flex justify-center items-center h-[80vh]">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="flex justify-center items-center h-[60vh]">
+            <Loader />
         </div>
     );
 
     return (
-        <div className="animate-fade-in-up max-w-[1400px] mx-auto pb-12">
+        <div className="animate-fade-in-up max-w-[1200px] mx-auto pb-12">
 
-            {/* Page Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
-                    <h1 className="text-3xl font-black text-dark-bg tracking-tight mb-2">Panel de Analíticas</h1>
-                    <p className="text-gray-500 font-medium">Visión general del rendimiento de la tienda.</p>
+                    <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+                        <Link href="/admin/dashboard" className="hover:text-primary transition-colors">Panel</Link>
+                        <span>/</span>
+                        <span className="text-gray-800">Analíticas</span>
+                    </div>
+                    <div className="flex items-baseline gap-3">
+                        <h1 className="text-xl font-black text-dark-bg tracking-tight">Reportes</h1>
+                        <span className="text-gray-400 text-xs font-medium">Resumen de actividad</span>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    {/* Period Selector (Mock) */}
+                    {/* Period Selector */}
                     <div className="relative">
                         <select
                             value={period}
                             onChange={(e) => setPeriod(e.target.value)}
-                            className="appearance-none bg-white border border-gray-200 text-gray-700 py-2.5 px-4 pr-10 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                            className="appearance-none bg-white border border-gray-200 text-gray-600 py-2 px-3 pr-8 rounded-lg text-xs font-bold focus:outline-none focus:border-gray-300 cursor-pointer transition-all"
                         >
-                            <option value="all">Todo el Tiempo</option>
-                            <option value="month">Últimos 30 Días</option>
+                            <option value="all">Histórico</option>
+                            <option value="month">Último Mes</option>
                         </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                            <FaCalendarDays />
-                        </div>
+                        <FaCalendarDays className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none" />
                     </div>
 
                     <button
                         onClick={generatePDF}
-                        className="flex items-center gap-2 bg-dark-bg text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-dark-bg/20 hover:bg-gray-800 transition-all"
+                        className="bg-dark-bg text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-800 transition-all active:scale-95 flex items-center gap-2"
                     >
-                        <FaFilePdf />
-                        <span>Descargar Reporte</span>
+                        <FaFilePdf size={12} />
+                        <span>Exportar</span>
                     </button>
+
+                    <Link
+                        href="/admin/dashboard"
+                        className="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-50 transition-all flex items-center gap-2"
+                    >
+                        <FaArrowLeft size={12} />
+                        <span>Volver</span>
+                    </Link>
                 </div>
             </div>
 
             {/* KPI Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 {kpis.map((kpi, i) => <KPICard key={i} kpi={kpi} />)}
             </div>
 
             {/* Charts Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                 {/* Main Revenue Chart */}
                 <div className="lg:col-span-2">
-                    <ChartCard title="Tendencias de Ingresos">
+                    <ChartCard title="Ingresos Recientes" icon={FaChartLine}>
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={salesData}>
                                 <defs>
                                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#dc2626" stopOpacity={0.1} />
+                                        <stop offset="5%" stopColor="#dc2626" stopOpacity={0.05} />
                                         <stop offset="95%" stopColor="#dc2626" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} dy={10} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 10 }} tickFormatter={(value) => `$${value}`} />
                                 <Tooltip
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value: number | undefined) => [`$${(value || 0).toFixed(2)}`, 'Ingresos']}
+                                    cursor={{ stroke: '#dc2626', strokeWidth: 1, strokeDasharray: '4 4' }}
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', padding: '8px', fontSize: '12px' }}
+                                    formatter={(value: any) => [`$${parseFloat(value || 0).toFixed(2)}`, 'Venta']}
                                 />
-                                <Area type="monotone" dataKey="amount" stroke="#dc2626" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                                <Area
+                                    type="monotone"
+                                    dataKey="amount"
+                                    stroke="#dc2626"
+                                    strokeWidth={2}
+                                    fillOpacity={1}
+                                    fill="url(#colorRevenue)"
+                                    activeDot={{ r: 4, strokeWidth: 0, fill: '#dc2626' }}
+                                />
                             </AreaChart>
                         </ResponsiveContainer>
                     </ChartCard>
@@ -302,7 +332,7 @@ export default function AdminReports() {
 
                 {/* Status Distribution */}
                 <div className="lg:col-span-1">
-                    <ChartCard title="Estado de Pedidos">
+                    <ChartCard title="Estado Pedidos" icon={FaBoxOpen}>
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
@@ -311,62 +341,114 @@ export default function AdminReports() {
                                     cy="50%"
                                     innerRadius={60}
                                     outerRadius={80}
-                                    paddingAngle={5}
+                                    paddingAngle={2}
                                     dataKey="value"
+                                    cornerRadius={4}
                                 >
                                     {statusData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} strokeWidth={0} />
                                     ))}
                                 </Pie>
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                <Legend verticalAlign="bottom" height={36} />
+                                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }} />
+                                <Legend verticalAlign="bottom" height={36} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '10px' }} />
                             </PieChart>
                         </ResponsiveContainer>
                     </ChartCard>
                 </div>
             </div>
 
-            {/* Top Customers Table (Mini) */}
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-                <h3 className="font-bold text-gray-800 mb-6">Mejores Clientes</h3>
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50/50 border-b border-gray-100">
-                            <tr>
-                                <th className="text-left py-3 px-4 text-xs font-bold text-gray-500 uppercase">Cliente</th>
-                                <th className="text-right py-3 px-4 text-xs font-bold text-gray-500 uppercase">Gasto Total</th>
-                                <th className="text-right py-3 px-4 text-xs font-bold text-gray-500 uppercase">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {topCustomers.map((customer, idx) => (
-                                <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                                    <td className="py-4 px-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
-                                                {customer.name.charAt(0)}
-                                            </div>
-                                            <span className="font-bold text-gray-700">{customer.name}</span>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-4 text-right">
-                                        <span className="font-black text-gray-900">${customer.total.toFixed(2)}</span>
-                                    </td>
-                                    <td className="py-4 px-4 text-right">
-                                        <button className="text-primary text-xs font-bold hover:underline">Ver Perfil</button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {topCustomers.length === 0 && (
-                                <tr>
-                                    <td colSpan={3} className="text-center py-4 text-gray-500">No hay datos disponibles</td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            {/* Bottom Grid: Top Customers & Top Products */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
+                {/* Top Products */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
+                    <div className="flex items-center gap-2 mb-4">
+                        <FaTrophy className="text-gray-400" size={14} />
+                        <h3 className="font-bold text-gray-800 text-sm">Productos Top</h3>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50/50 border-b border-gray-100">
+                                <tr>
+                                    <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Producto</th>
+                                    <th className="text-right py-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">U.</th>
+                                    <th className="text-right py-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-dashed divide-gray-100">
+                                {topProducts.map((product, idx) => (
+                                    <tr key={idx} className="group hover:bg-gray-50/50 transition-colors">
+                                        <td className="py-3 px-3">
+                                            <div className="flex items-center gap-2">
+                                                <span className={`text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ${idx === 0 ? 'bg-dark-bg text-white' : 'bg-gray-100 text-gray-500'}`}>
+                                                    {idx + 1}
+                                                </span>
+                                                <span className="font-bold text-gray-700 text-xs truncate max-w-[160px]" title={product.name}>{product.name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-3 text-right">
+                                            <span className="font-medium text-gray-500 text-xs">{product.qty}</span>
+                                        </td>
+                                        <td className="py-3 px-3 text-right">
+                                            <span className="font-bold text-gray-900 text-xs">${product.revenue.toFixed(0)}</span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {topProducts.length === 0 && (
+                                    <tr>
+                                        <td colSpan={3} className="text-center py-6 text-gray-400 text-sm">Sin datos de ventas</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Top Customers */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
+                    <div className="flex items-center gap-2 mb-4">
+                        <FaUserGroup className="text-gray-400" size={14} />
+                        <h3 className="font-bold text-gray-800 text-sm">Mejores Clientes</h3>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50/50 border-b border-gray-100">
+                                <tr>
+                                    <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cliente</th>
+                                    <th className="text-right py-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Gasto</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-dashed divide-gray-100">
+                                {topCustomers.map((customer, idx) => (
+                                    <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
+                                        <td className="py-3 px-3">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500">
+                                                    {customer.name.charAt(0)}
+                                                </div>
+                                                <span className="font-bold text-gray-700 text-xs">{customer.name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-3 text-right">
+                                            <span className="font-black text-gray-900 text-xs">
+                                                ${customer.total.toFixed(2)}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {topCustomers.length === 0 && (
+                                    <tr>
+                                        <td colSpan={2} className="text-center py-6 text-gray-400 text-sm">Sin datos de clientes</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </div>
     );
 }

@@ -1,4 +1,7 @@
 const productRepository = require('../repositories/productRepository');
+const orderRepository = require('../repositories/orderRepository');
+const { HTTP_CODES } = require('../utils/constants');
+const AppError = require('../utils/AppError');
 
 class ProductService {
   async getAllProducts() {
@@ -27,9 +30,6 @@ class ProductService {
   }
 
   async getRelatedProducts(productId, categoryId) {
-    // Avoid circular dependency if I needed Op here, but I can pass query obj to repo
-    // I need Op.ne. I can try requiring sequelize or just passing the object if repo handles it.
-    // Repo findAll takes raw sequelize where clause.
     const { Op } = require('sequelize');
 
     const related = await productRepository.findAll({
@@ -53,8 +53,6 @@ class ProductService {
   }
 
   async createProduct(data) {
-    // Business Logic: Check if SKU exists? (Repository might throw unique constraint error)
-    // For now, simple pass-through
     return await productRepository.create(data);
   }
 
@@ -63,6 +61,11 @@ class ProductService {
   }
 
   async deleteProduct(id) {
+    // Check for active orders
+    const hasActiveOrders = await orderRepository.hasActiveOrders(id);
+    if (hasActiveOrders) {
+      throw new AppError('No se puede eliminar el producto porque pertenece a pedidos activos.', HTTP_CODES.CONFLICT); // 409
+    }
     return await productRepository.delete(id);
   }
 }

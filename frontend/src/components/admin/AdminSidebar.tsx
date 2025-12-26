@@ -30,7 +30,7 @@ export default function AdminSidebar() {
         const checkStock = async () => {
             try {
                 // Using getAdminDashboard as it returns all products with stock info
-                const products = await productService.getAdminDashboard();
+                const products = await productService.getAdminDashboard(token);
                 const lowStock = products.filter(p => p.stock < 5);
 
                 const newNotifs = lowStock.map(p => ({
@@ -98,7 +98,7 @@ export default function AdminSidebar() {
                                 : 'text-gray-400 hover:text-white hover:bg-white/5'
                                 }`}
                         >
-                            <item.icon className={`text-lg transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-white'}`} />
+                            <item.icon className={`text-lg transition-transform ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-white'}`} />
                             <span className="relative z-10">{item.name}</span>
                         </Link>
                     );
@@ -121,7 +121,9 @@ export default function AdminSidebar() {
                         </div>
                         <div className="flex flex-col">
                             <span className="text-sm font-bold">Notificaciones</span>
-                            <span className="text-xs text-rose-500 font-medium">{notifications.length > 0 ? `${notifications.length} Nuevas` : 'Sin nuevas'}</span>
+                            {notifications.length > 0 && (
+                                <span className="text-xs text-rose-500 font-bold bg-rose-500/10 px-2 rounded-full w-fit mt-0.5">{notifications.length}</span>
+                            )}
                         </div>
                     </button>
 

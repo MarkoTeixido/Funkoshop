@@ -17,8 +17,9 @@ export const productService = {
     },
 
     // Admin Endpoints
-    getAdminDashboard: async (): Promise<Product[]> => {
-        const response = await api.get<Product[]>('/admin/dashboard');
+    getAdminDashboard: async (token?: string): Promise<Product[]> => {
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        const response = await api.get<Product[]>('/admin/dashboard', config);
         return response.data;
     },
 

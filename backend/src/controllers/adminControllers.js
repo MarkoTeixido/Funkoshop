@@ -47,6 +47,28 @@ const adminControllers = {
         res.json(orders);
     }),
 
+    // Update Order Status
+    updateOrderStatus: asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        // Basic validation could go here or in middleware
+        const validStatuses = ['pending', 'paid', 'processing', 'shipped', 'completed', 'cancelled'];
+        if (!status || !validStatuses.includes(status)) {
+            throw new AppError('Estado inválido', HTTP_CODES.BAD_REQUEST);
+        }
+
+        await orderService.updateStatus(id, status);
+        res.json({ success: true, message: 'Estado del pedido actualizado' });
+    }),
+
+    // Delete Order
+    deleteOrder: asyncHandler(async (req, res) => {
+        const { id } = req.params;
+        await orderService.deleteOrder(id);
+        res.json({ success: true, message: 'Pedido eliminado correctamente' });
+    }),
+
     // Reports: Downloadable Data
     getReports: asyncHandler(async (req, res) => {
         const { period } = req.query;

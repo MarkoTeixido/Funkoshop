@@ -7,6 +7,7 @@ import SearchInput from '@/components/ui/SearchInput';
 import ProductTable from '@/components/admin/ProductTable';
 import Loader from '@/components/ui/Loader';
 import StatCard from '@/components/admin/StatCard';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 
 const ITEMS_PER_PAGE = 15;
 
@@ -22,6 +23,46 @@ export default function AdminDashboard() {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
+
+    // Modal State
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        confirmText: 'Confirmar',
+        cancelText: 'Cancelar',
+        onConfirm: () => { },
+        variant: 'danger' as 'danger' | 'warning' | 'info'
+    });
+
+    const requestDeleteProduct = (id: number) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Eliminar Producto',
+            message: '¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.',
+            variant: 'danger',
+            confirmText: 'Eliminar',
+            cancelText: 'Cancelar',
+            onConfirm: async () => {
+                try {
+                    await deleteProduct(id);
+                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                    // Clean error state if any
+                } catch (error: any) {
+                    // Re-use modal to show error
+                    setConfirmModal({
+                        isOpen: true,
+                        title: 'No se puede eliminar',
+                        message: error.message || 'Hubo un error al intentar eliminar el producto.',
+                        variant: 'warning',
+                        confirmText: 'Entendido',
+                        cancelText: '', // Hide cancel button for error messages
+                        onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
+                    });
+                }
+            }
+        });
+    };
 
     // Refs for click outside
     const filterRef = useRef<HTMLDivElement>(null);
@@ -137,7 +178,7 @@ export default function AdminDashboard() {
                 </div>
                 <Link href="/admin/products/create" className="bg-primary hover:bg-rose-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg shadow-primary/25 hover:shadow-rose-600/30 transition-all flex items-center gap-2 group text-sm">
                     <FaPlus className="group-hover:rotate-90 transition-transform" />
-                    <span>Agregar Nuevo Producto</span>
+                    <span>Agregar Producto</span>
                 </Link>
             </div>
 
@@ -149,6 +190,7 @@ export default function AdminDashboard() {
                     icon={FaBox}
                     trend="up"
                     trendValue={newProductsCount > 0 ? `+${newProductsCount} esta semana` : "Sin cambios"}
+                    variant="blue"
                 />
                 <StatCard
                     title="Bajo Stock"
@@ -157,12 +199,14 @@ export default function AdminDashboard() {
                     trend={lowStockItems > 0 ? "down" : "neutral"}
                     trendValue={lowStockItems > 0 ? "Requiere atención" : "Stock saludable"}
                     alert={lowStockItems > 0}
+                    variant={lowStockItems > 0 ? "rose" : "amber"}
                 />
                 <StatCard
                     title="Valor Total del Inventario"
                     value={`$${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                     icon={FaMoneyBillWave}
                     subtext="Actualizado en tiempo real"
+                    variant="emerald"
                 />
             </div>
 
@@ -254,7 +298,7 @@ export default function AdminDashboard() {
                 )}
 
                 <div className="p-4 text-black w-full overflow-x-auto">
-                    <ProductTable products={paginatedProducts} onDelete={deleteProduct} />
+                    <ProductTable products={paginatedProducts} onDelete={requestDeleteProduct} />
 
                     {paginatedProducts.length === 0 && (
                         <div className="text-center py-12 text-gray-500 font-medium">
@@ -299,6 +343,17 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText={confirmModal.confirmText}
+                cancelText={confirmModal.cancelText}
+                variant={confirmModal.variant}
+            />
         </div>
     );
 }

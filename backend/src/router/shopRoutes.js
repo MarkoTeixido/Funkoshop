@@ -40,6 +40,7 @@ router.get('/item/:id', shopControllers.idView);
 router.use(verifyToken); // Apply to all below
 
 router.get('/orders', shopControllers.getOrders);
+router.put('/orders/:id/cancel', shopControllers.cancelOrder);
 
 router.get('/cart', shopControllers.getCart);
 router.post('/cart', cartAddValidation, shopControllers.addToCart);

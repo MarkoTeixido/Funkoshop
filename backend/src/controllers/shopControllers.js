@@ -30,6 +30,19 @@ const shopControllers = {
     res.json(orders);
   }),
 
+  // Cancel Order
+  cancelOrder: asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    try {
+      await orderService.cancelUserOrder(id, userId);
+      res.json({ success: true, message: 'Pedido cancelado correctamente' });
+    } catch (error) {
+      throw new AppError(error.message, HTTP_CODES.BAD_REQUEST);
+    }
+  }),
+
   // Cart: Get
   getCart: asyncHandler(async (req, res) => {
     const cart = await cartService.getCart(req.user.id);
