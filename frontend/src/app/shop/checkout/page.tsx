@@ -227,7 +227,7 @@ export default function CheckoutPage() {
                     {/* Left Column: Form Steps */}
                     <div className="lg:col-span-7">
                         {/* Step Progress */}
-                        <div className="flex items-center mb-10 space-x-4">
+                        <div className="flex items-center justify-center md:justify-start mb-10 space-x-4">
                             <div className={`flex items-center transition-colors duration-300 ${step >= 1 ? 'text-primary' : 'text-gray-600'}`}>
                                 <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg border-2 ${step >= 1 ? 'border-primary bg-primary/20' : 'border-gray-700 bg-transparent'}`}>1</div>
                                 <span className="ml-3 font-bold uppercase hidden md:inline">Envío</span>
@@ -275,7 +275,7 @@ export default function CheckoutPage() {
                                                     <input required value={shippingData.phone} onChange={e => setShippingData({ ...shippingData, phone: e.target.value })} type="tel" className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="+54 11 1234 5678" />
                                                 </div>
                                             </div>
-                                            <div className="pt-6 flex justify-end">
+                                            <div className="pt-6 flex justify-center">
                                                 <button type="submit" className="bg-primary hover:bg-primary-hover text-white font-bold py-4 px-10 rounded-full transition-all transform hover:scale-[1.02] shadow-lg shadow-primary/25 flex items-center gap-3">
                                                     Continuar a Pago <FaChevronRight />
                                                 </button>
@@ -295,8 +295,8 @@ export default function CheckoutPage() {
                                 >
                                     <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2rem] shadow-2xl">
                                         <div className="flex items-center justify-between mb-8">
-                                            <h2 className="text-2xl font-bold text-white uppercase flex items-center gap-3">
-                                                <FaCreditCard className="text-primary" /> Método de Pago
+                                            <h2 className="text-xl md:text-2xl font-bold text-white uppercase flex items-center gap-3">
+                                                <FaCreditCard className="text-primary shrink-0" /> Método de Pago
                                             </h2>
                                             <div className="flex gap-2 opacity-50">
                                                 <div className="w-10 h-6 bg-white/10 rounded"></div>
@@ -315,31 +315,70 @@ export default function CheckoutPage() {
 
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400 pl-1">Nombre en Tarjeta</label>
-                                                <input required value={paymentData.cardName} onChange={e => setPaymentData({ ...paymentData, cardName: e.target.value })} type="text" className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="JUAN PEREZ" />
+                                                <input required value={paymentData.cardName} onChange={e => setPaymentData({ ...paymentData, cardName: e.target.value.toUpperCase() })} type="text" className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="JUAN PEREZ" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-xs font-bold uppercase tracking-widest text-gray-400 pl-1">Número de Tarjeta</label>
-                                                <input required value={paymentData.cardNumber} onChange={e => setPaymentData({ ...paymentData, cardNumber: e.target.value })} type="text" maxLength={19} className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="0000 0000 0000 0000" />
+                                                <input
+                                                    required
+                                                    value={paymentData.cardNumber}
+                                                    onChange={e => {
+                                                        const val = e.target.value.replace(/\D/g, '').substring(0, 16);
+                                                        const formatted = val.replace(/(\d{4})(?=\d)/g, '$1 ');
+                                                        setPaymentData({ ...paymentData, cardNumber: formatted });
+                                                    }}
+                                                    type="text"
+                                                    maxLength={19}
+                                                    className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                                                    placeholder="0000 0000 0000 0000"
+                                                />
                                             </div>
                                             <div className="grid grid-cols-2 gap-6">
                                                 <div className="space-y-2">
                                                     <label className="text-xs font-bold uppercase tracking-widest text-gray-400 pl-1">Vencimiento</label>
-                                                    <input required value={paymentData.expiry} onChange={e => setPaymentData({ ...paymentData, expiry: e.target.value })} type="text" maxLength={5} className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="MM/YY" />
+                                                    <input
+                                                        required
+                                                        value={paymentData.expiry}
+                                                        onChange={e => {
+                                                            const val = e.target.value.replace(/\D/g, '').substring(0, 6);
+                                                            let formatted = val;
+                                                            if (val.length >= 2) {
+                                                                formatted = val.substring(0, 2) + (val.length > 2 ? '/' + val.substring(2) : '');
+                                                            }
+                                                            // Better mask logic to handle deletion correctly? 
+                                                            // Simple approach: Always reformat raw numbers.
+                                                            // If deleting '/', user deletes char before it.
+                                                            // If val has 2 chars (e.g. '12'), display '12'. User types 3rd char '123' -> '12/3'.
+                                                            setPaymentData({ ...paymentData, expiry: formatted });
+                                                        }}
+                                                        type="text"
+                                                        maxLength={7}
+                                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-4 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                                                        placeholder="MM/AAAA"
+                                                    />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label className="text-xs font-bold uppercase tracking-widest text-gray-400 pl-1">CVC</label>
-                                                    <input required value={paymentData.cvc} onChange={e => setPaymentData({ ...paymentData, cvc: e.target.value })} type="text" maxLength={4} className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-6 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" placeholder="123" />
+                                                    <input
+                                                        required
+                                                        value={paymentData.cvc}
+                                                        onChange={e => setPaymentData({ ...paymentData, cvc: e.target.value.replace(/\D/g, '').substring(0, 4) })}
+                                                        type="text"
+                                                        maxLength={4}
+                                                        className="w-full bg-black/40 border border-white/10 rounded-xl py-4 px-4 text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
+                                                        placeholder="123"
+                                                    />
                                                 </div>
                                             </div>
 
-                                            <div className="pt-8 flex justify-between items-center">
+                                            <div className="pt-8 flex flex-col-reverse sm:flex-row justify-between items-center gap-6 sm:gap-0">
                                                 <button type="button" onClick={() => setStep(1)} className="text-gray-400 hover:text-white font-bold text-sm uppercase transition-colors">
                                                     Volver
                                                 </button>
                                                 <button
                                                     type="submit"
                                                     disabled={processingPayment}
-                                                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-10 rounded-full transition-all transform hover:scale-[1.02] shadow-lg shadow-green-500/25 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-10 rounded-full transition-all transform hover:scale-[1.02] shadow-lg shadow-green-500/25 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
                                                     {processingPayment ? (
                                                         <>Procesando <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div></>
@@ -363,7 +402,7 @@ export default function CheckoutPage() {
 
                                 <h3 className="text-xl font-bold text-white uppercase mb-8 border-b border-white/10 pb-4">Resumen de Orden</h3>
 
-                                <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto p-4 custom-scrollbar">
                                     {cartItems.map((item) => (
                                         <div key={item.cart_item_id} className="flex gap-4 group">
                                             <div className="w-20 h-20 bg-white/5 rounded-2xl p-2 border border-white/10 relative shrink-0">
@@ -374,13 +413,13 @@ export default function CheckoutPage() {
                                                     height={80}
                                                     className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-500"
                                                 />
-                                                <span className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center border border-dark-bg">
+                                                <span className="absolute -top-2 -right-2 w-6 h-6 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center border border-dark-bg z-10 shadow-sm">
                                                     {item.quantity}
                                                 </span>
                                             </div>
                                             <div className="flex-1 min-w-0 flex flex-col justify-center">
                                                 <h4 className="text-white font-bold truncate text-sm mb-1">{item.Product.product_name}</h4>
-                                                <p className="text-gray-400 text-xs text-primary">{item.Product.is_new ? 'New Arrival' : 'In Stock'}</p>
+                                                <p className="text-gray-400 text-xs text-primary">{item.Product.is_new ? 'Nuevo' : 'En Stock'}</p>
                                             </div>
                                             <div className="flex flex-col justify-center text-right">
                                                 <span className="text-white font-bold text-sm">${(Number(item.Product.price) * item.quantity).toFixed(2)}</span>

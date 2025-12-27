@@ -55,14 +55,14 @@ export default async function Home() {
                             Nueva Colección
                         </span>
 
-                        <h1 className="text-6xl md:text-8xl font-black text-white italic tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
+                        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black text-white italic tracking-tight uppercase leading-[0.9] drop-shadow-2xl">
                             Desata el <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-500 pr-6">
                                 Multiverso
                             </span>
                         </h1>
 
-                        <p className="max-w-xl text-gray-200 text-lg md:text-xl font-semibold leading-relaxed drop-shadow-lg">
+                        <p className="max-w-xl text-gray-200 text-base sm:text-lg md:text-xl font-semibold leading-relaxed drop-shadow-lg">
                             Sumérgete en la colección más exclusiva. Desde raras variantes chase hasta tus favoritos. Encuentra el Pop! que completa tu set.
                         </p>
 
@@ -144,17 +144,17 @@ export default async function Home() {
                 {/* Newsletter / Club */}
                 <section className="py-24 bg-dark-bg">
                     <div className="container-custom">
-                        <div className="bg-gradient-to-r from-gray-900 to-black border border-white/10 rounded-[3rem] p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between min-h-[400px]">
-                            <div className="relative z-20 max-w-xl">
-                                <h2 className="text-4xl md:text-5xl font-black text-white italic uppercase mb-4">Únete al <span className="text-primary">FunkoClub</span></h2>
-                                <p className="text-gray-400 text-lg mb-8">Desbloquea 10% de descuento en tu primer pedido, además de acceso anticipado a lanzamientos de edición limitada y ventas exclusivas para miembros.</p>
+                        <div className="bg-gradient-to-r from-gray-900 to-black border border-white/10 rounded-[3rem] p-6 md:p-12 relative overflow-hidden flex flex-col md:flex-row items-center justify-between min-h-[400px]">
+                            <div className="relative z-20 max-w-xl text-center md:text-left">
+                                <h2 className="text-3xl md:text-5xl font-black text-white italic uppercase mb-4">Únete al <span className="text-primary">FunkoClub</span></h2>
+                                <p className="text-gray-300 text-base md:text-lg mb-8">Desbloquea 10% de descuento en tu primer pedido, además de acceso anticipado a lanzamientos de edición limitada y ventas exclusivas para miembros.</p>
                                 <div className="flex flex-col sm:flex-row gap-4">
                                     <input type="email" placeholder="Ingresa tu correo electrónico" className="bg-white/5 border border-white/10 rounded-full px-6 py-4 text-white placeholder:text-gray-500 focus:outline-none focus:border-primary w-full md:w-80" />
                                     <button className="bg-primary hover:bg-primary-hover text-white font-bold px-8 py-4 rounded-full transition-colors whitespace-nowrap">
                                         Suscribirme
                                     </button>
                                 </div>
-                                <p className="text-gray-600 text-xs mt-4">Al registrarte aceptas nuestros Términos y Condiciones.</p>
+                                <p className="text-gray-500 text-xs mt-4">Al registrarte aceptas nuestros Términos y Condiciones.</p>
                             </div>
 
                             {/* Blended Background Image */}
@@ -164,7 +164,7 @@ export default async function Home() {
                                     src="https://res.cloudinary.com/dp7jr9k94/image/upload/v1766491660/Google_AI_Studio_2025-12-23T12_07_11.596Z_r0bnhw.png"
                                     alt="Club Mascot"
                                     fill
-                                    className="object-cover object-center opacity-80 mix-blend-lighten"
+                                    className="object-cover object-center opacity-20 md:opacity-80 mix-blend-lighten"
                                 />
                             </div>
                         </div>

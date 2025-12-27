@@ -167,7 +167,7 @@ export default function AdminDashboard() {
 
     return (
         <div className="animate-fade-in-up">
-            <div className="flex justify-between items-end mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-6">
                 <div>
                     <div className="flex items-center gap-2 text-gray-500 text-xs font-medium mb-1">
                         <span>Inicio</span>
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
                     <h1 className="text-2xl font-black text-dark-bg tracking-tight">Inventario de Productos</h1>
                     <p className="text-gray-500 text-sm mt-1">Administra tu catálogo, niveles de stock y precios.</p>
                 </div>
-                <Link href="/admin/products/create" className="bg-primary hover:bg-rose-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg shadow-primary/25 hover:shadow-rose-600/30 transition-all flex items-center gap-2 group text-sm">
+                <Link href="/admin/products/create" className="bg-primary hover:bg-rose-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg shadow-primary/25 hover:shadow-rose-600/30 transition-all flex items-center gap-2 group text-sm w-full md:w-auto justify-center">
                     <FaPlus className="group-hover:rotate-90 transition-transform" />
                     <span>Agregar Producto</span>
                 </Link>

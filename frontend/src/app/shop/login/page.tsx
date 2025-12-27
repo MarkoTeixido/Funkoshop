@@ -56,9 +56,9 @@ export default function LoginPage() {
                 <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
 
-                <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-8 md:p-12 rounded-3xl shadow-2xl relative z-10">
+                <div className="w-full max-w-md bg-white/5 backdrop-blur-xl border border-white/10 p-6 md:p-12 rounded-3xl shadow-2xl relative z-10">
                     <div className="text-center mb-10">
-                        <h1 className="text-4xl font-black italic uppercase text-white mb-2">Bienvenido de Nuevo</h1>
+                        <h1 className="text-3xl md:text-4xl font-black italic uppercase text-white mb-2">Bienvenido de Nuevo</h1>
                         <p className="text-gray-400">Ingresa tus credenciales para acceder a tu cuenta.</p>
                     </div>
 
@@ -77,7 +77,7 @@ export default function LoginPage() {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
                                     placeholder="nombre@ejemplo.com"
                                     required
                                 />
@@ -92,7 +92,7 @@ export default function LoginPage() {
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
                                     placeholder="••••••••"
                                     required
                                 />
@@ -108,7 +108,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed group"
+                            className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed group"
                         >
                             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
                             {!loading && <FaArrowRight className="group-hover:translate-x-1 transition-transform" />}

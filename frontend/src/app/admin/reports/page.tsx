@@ -367,8 +367,8 @@ export default function AdminReports() {
                         <h3 className="font-bold text-gray-800 text-sm">Productos Top</h3>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
+                    <div className="overflow-x-auto scrollbar-thin-light">
+                        <table className="w-full min-w-[400px]">
                             <thead className="bg-gray-50/50 border-b border-gray-100">
                                 <tr>
                                     <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Producto</th>
@@ -412,8 +412,8 @@ export default function AdminReports() {
                         <h3 className="font-bold text-gray-800 text-sm">Mejores Clientes</h3>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
+                    <div className="overflow-x-auto scrollbar-thin-light">
+                        <table className="w-full min-w-[400px]">
                             <thead className="bg-gray-50/50 border-b border-gray-100">
                                 <tr>
                                     <th className="text-left py-2 px-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Cliente</th>

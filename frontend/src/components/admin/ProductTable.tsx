@@ -9,7 +9,7 @@ interface ProductTableProps {
 
 export default function ProductTable({ products, onDelete }: ProductTableProps) {
     return (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-thin-light">
             <table className="w-full text-left text-sm min-w-[600px]">
                 <thead>
                     <tr className="border-b border-gray-100">

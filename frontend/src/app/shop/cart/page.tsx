@@ -108,7 +108,7 @@ export default function CartPage() {
                     {cartItems.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 border border-dashed border-white/10 rounded-2xl bg-white/5">
                             <h2 className="text-2xl font-bold text-white mb-4">Tu carrito está vacío</h2>
-                            <p className="text-gray-400 mb-8">Parece que aún no has agregado ningún Funko.</p>
+                            <p className="text-gray-400 mb-8 text-center px-4">Parece que aún no has agregado ningún Funko.</p>
                             <Link href="/shop" className="bg-primary hover:bg-primary-hover text-white font-bold px-8 py-3 rounded-full transition-colors">
                                 Comenzar a Comprar
                             </Link>

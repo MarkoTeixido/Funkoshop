@@ -243,16 +243,15 @@ export default function ProfilePage() {
                     {/* Content - Right Column */}
                     <div className="lg:col-span-8 space-y-12">
 
-                        {/* Welcome Header */}
                         <motion.div
                             initial={{ y: -20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.5, delay: 0.2 }}
-                            className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/10 pb-8"
+                            className="flex flex-col md:flex-row justify-between items-center md:items-end gap-4 border-b border-white/10 pb-8"
                         >
-                            <div>
-                                <h1 className="text-4xl md:text-5xl font-black italic uppercase text-white mb-2">Hola, {formData.name}</h1>
-                                <p className="text-gray-400 text-lg">Bienvenido a tu panel de control.</p>
+                            <div className="text-center md:text-left w-full md:w-auto">
+                                <h1 className="text-3xl md:text-5xl font-black italic uppercase text-white mb-2 break-words leading-tight">Hola, {formData.name}</h1>
+                                <p className="text-gray-400 text-base md:text-lg">Bienvenido a tu panel de control.</p>
                             </div>
                         </motion.div>
 
@@ -262,11 +261,11 @@ export default function ProfilePage() {
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.5, delay: 0.4 }}
                         >
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-2xl font-bold text-white uppercase flex items-center gap-3">
-                                    <FaBoxOpen className="text-primary" /> Historial de Pedidos
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                                <h3 className="text-xl md:text-2xl font-bold text-white uppercase flex items-center gap-3">
+                                    <FaBoxOpen className="text-primary shrink-0" /> Historial de Pedidos
                                 </h3>
-                                <span className="text-sm font-bold bg-white/10 px-3 py-1 rounded-full text-white">{orders.length} Pedidos</span>
+                                <span className="self-start sm:self-auto text-xs font-bold bg-white/10 px-3 py-1 rounded-full text-white whitespace-nowrap">{orders.length} Pedidos</span>
                             </div>
 
                             {orders.length === 0 ? (

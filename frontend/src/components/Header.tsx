@@ -119,9 +119,11 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
                             className="bg-white/10 border border-white/10 rounded-full px-4 py-2 text-sm text-white focus:outline-none focus:border-primary w-40 focus:w-64 transition-all"
                         />
                     </div>
+                </div>
 
+                <div className="flex items-center gap-2 sm:gap-4 lg:gap-6">
                     {/* Actions */}
-                    <div className="flex items-center gap-6 border-l border-white/10 pl-6">
+                    <div className="flex items-center gap-4 lg:gap-6 lg:border-l lg:border-white/10 lg:pl-6">
                         {isAdmin && (
                             <button className="relative text-white hover:text-primary transition-colors">
                                 <FaRegBell size={20} />
@@ -140,56 +142,65 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
                         )}
 
                         {user ? (
-                            <div className="relative" ref={dropdownRef}>
-                                <button
-                                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                    className="flex items-center gap-2 text-white hover:text-primary transition-colors"
-                                >
+                            <>
+                                {/* Mobile: Direct Link to Profile */}
+                                <Link href="/shop/profile" className="lg:hidden text-white hover:text-primary transition-colors">
                                     <FaUser size={20} />
-                                    <span className="text-sm font-medium max-w-[100px] truncate">{user.name}</span>
-                                    <FaChevronDown size={10} />
-                                </button>
+                                </Link>
 
-                                {/* Dropdown */}
-                                <AnimatePresence>
-                                    {isUserMenuOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full right-0 mt-4 w-48 bg-[#141414] border border-white/10 rounded-lg shadow-xl overflow-hidden py-2"
-                                        >
-                                            <Link href="/shop/profile" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">Mi Perfil</Link>
-                                            <Link href="/shop/wishlist" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">Lista de Deseos</Link>
-                                            <Link href="/shop/orders" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">Mis Pedidos</Link>
-                                            <button
-                                                onClick={logout}
-                                                className="w-full text-left px-4 py-2 text-sm text-primary hover:bg-white/5"
+                                {/* Desktop: Dropdown Menu */}
+                                <div className="relative hidden lg:block" ref={dropdownRef}>
+                                    <button
+                                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                                        className="flex items-center gap-2 text-white hover:text-primary transition-colors"
+                                    >
+                                        <FaUser size={20} />
+                                        <span className="hidden sm:inline text-sm font-medium max-w-[100px] truncate">{user.name}</span>
+                                        <FaChevronDown size={10} className="hidden sm:block" />
+                                    </button>
+
+                                    {/* Dropdown */}
+                                    <AnimatePresence>
+                                        {isUserMenuOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: 10 }}
+                                                className="absolute top-full right-0 mt-4 w-48 bg-[#141414] border border-white/10 rounded-lg shadow-xl overflow-hidden py-2"
                                             >
-                                                Cerrar Sesión
-                                            </button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
+                                                <Link href="/shop/profile" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">Mi Perfil</Link>
+                                                <Link href="/shop/wishlist" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">Lista de Deseos</Link>
+                                                <Link href="/shop/orders" className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white">Mis Pedidos</Link>
+                                                <button
+                                                    onClick={logout}
+                                                    className="w-full text-left px-4 py-2 text-sm text-primary hover:bg-white/5"
+                                                >
+                                                    Cerrar Sesión
+                                                </button>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            </>
                         ) : (
                             <Link
                                 href="/shop/login"
-                                className="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-5 py-2.5 rounded-full transition-all transform hover:scale-105"
+                                className="bg-primary hover:bg-primary-hover text-white text-xs font-bold p-2 lg:px-5 lg:py-2.5 rounded-full transition-all transform hover:scale-105 whitespace-nowrap flex items-center justify-center h-9 w-9 sm:w-auto sm:h-auto"
                             >
-                                INICIAR SESIÓN
+                                <span className="hidden sm:inline">INICIAR SESIÓN</span>
+                                <span className="sm:hidden"><FaUser size={14} /></span>
                             </Link>
                         )}
                     </div>
-                </div>
 
-                {/* Mobile Toggle */}
-                <button
-                    className="lg:hidden text-white z-50 p-2"
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                >
-                    {isMobileMenuOpen ? <FaXmark size={24} /> : <FaBars size={24} />}
-                </button>
+                    {/* Mobile Toggle */}
+                    <button
+                        className="lg:hidden text-white z-50 p-2"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        {isMobileMenuOpen ? <FaXmark size={24} /> : <FaBars size={24} />}
+                    </button>
+                </div>
             </nav>
 
             {/* Mobile Menu Overlay */}
@@ -216,35 +227,32 @@ export default function Header({ isAdmin = false, notificationCount = 0 }: Heade
                                 </motion.li>
                             ))}
 
-                            {user ? (
+                            {/* User Links for Mobile */}
+                            {user && !isAdmin && (
                                 <>
-                                    <motion.li variants={itemVariants} className="w-12 h-px bg-white/10 my-4" />
+                                    <motion.div variants={itemVariants} className="w-12 h-px bg-white/20 my-2" />
+
+                                    {/* Link removed from here */}
+
                                     <motion.li variants={itemVariants}>
-                                        <Link href="/shop/profile" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-gray-300">
-                                            Mi Perfil
+                                        <Link href="/shop/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-300 hover:text-white">
+                                            LISTA DE DESEOS
                                         </Link>
                                     </motion.li>
                                     <motion.li variants={itemVariants}>
-                                        <Link href="/shop/wishlist" onClick={() => setIsMobileMenuOpen(false)} className="text-xl text-gray-300">
-                                            Lista de Deseos
+                                        <Link href="/shop/orders" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-bold text-gray-300 hover:text-white">
+                                            MIS PEDIDOS
                                         </Link>
                                     </motion.li>
                                     <motion.li variants={itemVariants}>
-                                        <button onClick={() => { logout(); setIsMobileMenuOpen(false); }} className="text-xl text-primary">
-                                            Cerrar Sesión
+                                        <button
+                                            onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                                            className="text-xl font-bold text-primary hover:text-red-400"
+                                        >
+                                            CERRAR SESIÓN
                                         </button>
                                     </motion.li>
                                 </>
-                            ) : (
-                                <motion.li variants={itemVariants} className="mt-8">
-                                    <Link
-                                        href="/shop/login"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="bg-primary text-white text-lg font-bold px-8 py-3 rounded-full"
-                                    >
-                                        INICIAR SESIÓN
-                                    </Link>
-                                </motion.li>
                             )}
                         </ul>
                     </motion.div>

@@ -41,12 +41,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
 
             {/* Main Image */}
             <div className="flex-1 relative aspect-square md:aspect-auto md:h-[600px] bg-white/5 rounded-3xl border border-white/5 overflow-hidden flex items-center justify-center p-8 group">
-                {/* Exclusive Badge Mockup - Can be dynamic later */}
-                <div className="absolute top-6 left-6 z-20">
-                    <span className="bg-black/80 text-white text-xs font-bold px-3 py-1 rounded-full border border-white/20 uppercase tracking-wider">
-                        Exclusive
-                    </span>
-                </div>
+
 
                 <div className="absolute top-6 right-6 z-20">
                     <button className="text-gray-400 hover:text-primary transition-colors">

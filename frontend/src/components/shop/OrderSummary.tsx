@@ -16,7 +16,7 @@ export default function OrderSummary({ subtotal, shipping = 0, tax = 0, onChecko
 
     return (
         <div className="bg-white rounded-3xl p-8 sticky top-32 text-gray-900 shadow-2xl">
-            <h2 className="text-2xl font-black uppercase italic mb-6">Order Summary</h2>
+            <h2 className="text-2xl font-black uppercase italic mb-6">Resumen del Pedido</h2>
 
             <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-sm font-medium text-gray-600">
@@ -24,13 +24,13 @@ export default function OrderSummary({ subtotal, shipping = 0, tax = 0, onChecko
                     <span>${subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-gray-600">
-                    <span>Estimated Shipping</span>
+                    <span>Envío Estimado</span>
                     <span className={shipping === 0 ? "text-green-600 font-bold" : ""}>
-                        {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                        {shipping === 0 ? "Gratis" : `$${shipping.toFixed(2)}`}
                     </span>
                 </div>
                 <div className="flex justify-between text-sm font-medium text-gray-600">
-                    <span>Tax</span>
+                    <span>Impuestos</span>
                     <span>${tax.toFixed(2)}</span>
                 </div>
             </div>
@@ -43,31 +43,31 @@ export default function OrderSummary({ subtotal, shipping = 0, tax = 0, onChecko
             </div>
 
             {/* Promo Code Input Mockup */}
-            <div className="flex gap-2 mb-8">
+            <div className="flex flex-col sm:flex-row gap-2 mb-8">
                 <input
                     type="text"
-                    placeholder="Promo Code"
-                    className="flex-1 bg-gray-100 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-black outline-none font-bold placeholder:font-medium placeholder:uppercase"
+                    placeholder="CÓDIGO PROMOCIONAL"
+                    className="w-full sm:flex-1 bg-gray-100 border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-black outline-none font-bold placeholder:font-medium placeholder:uppercase"
                 />
-                <button className="bg-black text-white px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors">
-                    Apply
+                <button className="w-full sm:w-auto bg-black text-white px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors">
+                    APLICAR
                 </button>
             </div>
 
             <button
                 onClick={onCheckout}
-                className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] group"
+                className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] group uppercase"
             >
-                Checkout <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+                FINALIZAR COMPRA <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
             </button>
 
             {/* Security Badge */}
             <div className="mt-8 flex items-start gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
                 <FaLock className="text-gray-400 mt-1 shrink-0" />
                 <div>
-                    <h4 className="font-bold text-xs uppercase mb-1">Secure Shopping</h4>
+                    <h4 className="font-bold text-xs uppercase mb-1">COMPRA SEGURA</h4>
                     <p className="text-[10px] text-gray-500 leading-relaxed">
-                        Every Funko Pop is shipped in a premium protector case to ensure it arrives in mint condition.
+                        Cada Funko Pop se envía con un protector premium para asegurar que llegue en perfectas condiciones.
                     </p>
                 </div>
             </div>

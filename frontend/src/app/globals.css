@@ -2,15 +2,18 @@
 
 @theme {
   /* Brand Colors */
-  --color-primary: #E50914; /* Netflix/Red style */
+  --color-primary: #E50914;
+  /* Netflix/Red style */
   --color-primary-hover: #F40612;
   --color-primary-dark: #B20710;
 
   /* Neutral Scale (Dark Mode Base) */
-  --color-dark-bg: #141414; /* Deep dark background */
-  --color-dark-surface: #1F1F1F; /* Card/Surface background */
+  --color-dark-bg: #141414;
+  /* Deep dark background */
+  --color-dark-surface: #1F1F1F;
+  /* Card/Surface background */
   --color-dark-border: #333333;
-  
+
   /* Text Colors */
   --color-text-main: #FFFFFF;
   --color-text-muted: #B3B3B3;
@@ -18,7 +21,8 @@
 
   /* Accents */
   --color-success: #46D369;
-  --color-error: #E50914; /* Use primary for error too mostly, or distinct red */
+  --color-error: #E50914;
+  /* Use primary for error too mostly, or distinct red */
 
   /* Fonts */
   --font-inter: var(--font-inter);
@@ -33,7 +37,7 @@
   html {
     @apply scroll-smooth;
   }
-  
+
   body {
     @apply bg-dark-bg text-text-main font-inter antialiased overflow-x-hidden;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
@@ -43,19 +47,37 @@
   ::-webkit-scrollbar {
     width: 8px;
   }
+
   ::-webkit-scrollbar-track {
     @apply bg-dark-bg;
   }
+
   ::-webkit-scrollbar-thumb {
     @apply bg-dark-border rounded-full hover:bg-neutral-600 transition-colors;
   }
+
+
 }
 
 @layer components {
   .container-custom {
     @apply max-w-[1400px] mx-auto px-4 md:px-8 xl:px-12 w-full;
   }
-  
+
+  /* Light Scrollbar for Admin Tables */
+  .scrollbar-thin-light::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin-light::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+  }
+
+  .scrollbar-thin-light::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400;
+  }
+
   .glass-panel {
     @apply bg-dark-surface/80 backdrop-blur-md border border-white/5;
   }
@@ -66,11 +88,23 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

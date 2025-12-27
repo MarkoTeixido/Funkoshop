@@ -20,6 +20,8 @@ interface ShopSidebarProps {
     categories: string[];
     selectedCategory: string;
     setSelectedCategory: (value: string) => void;
+    className?: string; // Add className prop
+    hideSearch?: boolean;
 }
 
 export default function ShopSidebar({
@@ -30,28 +32,32 @@ export default function ShopSidebar({
     filterNew, setFilterNew,
     filterOffers, setFilterOffers,
     filterSpecial, setFilterSpecial,
-    categories = [], selectedCategory, setSelectedCategory
+    categories = [], selectedCategory, setSelectedCategory,
+    className,
+    hideSearch = false
 }: ShopSidebarProps) {
     return (
-        <aside className="w-full md:w-[280px] shrink-0 flex flex-col gap-10 bg-dark-surface p-8 rounded-2xl border border-white/5 h-fit">
+        <aside className={cn("w-full md:w-[280px] shrink-0 flex flex-col gap-10 bg-dark-surface p-8 rounded-2xl border border-white/5 h-fit", className)}>
             <div className="flex items-center gap-2 text-primary border-b border-white/10 pb-4">
                 <FaFilter size={18} />
                 <h2 className="text-xl font-bold uppercase tracking-wider">Filtros</h2>
             </div>
 
             {/* Search */}
-            <div className="flex flex-col gap-3">
-                <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Buscar</label>
-                <div className="relative group">
-                    <input
-                        className="w-full bg-dark-bg border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-gray-600"
-                        type="text"
-                        placeholder="Buscar productos..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
+            {!hideSearch && (
+                <div className="flex flex-col gap-3">
+                    <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Buscar</label>
+                    <div className="relative group">
+                        <input
+                            className="w-full bg-dark-bg border border-white/10 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-gray-600"
+                            type="text"
+                            placeholder="Buscar productos..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Order */}
             <div className="flex flex-col gap-3">

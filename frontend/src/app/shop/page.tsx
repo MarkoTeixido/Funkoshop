@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from "@/components/ProductCard";
 import ShopSidebar from '@/components/shop/ShopSidebar';
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { FaAngleLeft, FaAngleRight, FaFilter, FaXmark, FaMagnifyingGlass } from "react-icons/fa6";
 import { useProducts } from '@/hooks/useProducts';
 import Loader from '@/components/ui/Loader';
 
@@ -10,6 +10,7 @@ export default function Shop() {
     const { products, pagination, loading, fetchProducts } = useProducts();
 
     // Filters
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [sort, setSort] = useState("");
     const [minPrice, setMinPrice] = useState("");
@@ -73,8 +74,10 @@ export default function Shop() {
 
     return (
         <div className="bg-dark-bg min-h-screen">
-            <div className="container-custom pt-32 pb-12 flex flex-col md:flex-row gap-12">
+            <div className="container-custom pt-25 md:pt-32 pb-12 flex flex-col md:flex-row gap-12">
+                {/* Desktop Sidebar */}
                 <ShopSidebar
+                    className="hidden md:flex"
                     search={search} setSearch={setSearch}
                     sort={sort} setSort={setSort}
                     minPrice={minPrice} setMinPrice={setMinPrice}
@@ -87,10 +90,66 @@ export default function Shop() {
                     setSelectedCategory={setSelectedCategory}
                 />
 
+                {/* Mobile Filter Modal */}
+                {isMobileFiltersOpen && (
+                    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex justify-end transition-all md:hidden">
+                        <div className="w-full max-w-[320px] h-full bg-dark-surface border-l border-white/10 overflow-y-auto p-6 shadow-2xl">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-bold text-white uppercase tracking-wider">Filtros</h3>
+                                <button onClick={() => setIsMobileFiltersOpen(false)} className="text-white hover:text-primary transition-colors">
+                                    <FaXmark size={24} />
+                                </button>
+                            </div>
+
+                            <ShopSidebar
+                                className="w-full p-0 border-none bg-transparent"
+                                hideSearch={true}
+                                search={search} setSearch={setSearch}
+                                sort={sort} setSort={setSort}
+                                minPrice={minPrice} setMinPrice={setMinPrice}
+                                maxPrice={maxPrice} setMaxPrice={setMaxPrice}
+                                filterNew={filterNew} setFilterNew={setFilterNew}
+                                filterOffers={filterOffers} setFilterOffers={setFilterOffers}
+                                filterSpecial={filterSpecial} setFilterSpecial={setFilterSpecial}
+                                categories={categories}
+                                selectedCategory={selectedCategory}
+                                setSelectedCategory={setSelectedCategory}
+                            />
+
+                            <button
+                                onClick={() => setIsMobileFiltersOpen(false)}
+                                className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 rounded-xl mt-8 sticky bottom-0 shadow-lg shadow-black/50"
+                            >
+                                Aplicar Filtros
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <div className="flex-1">
+                    {/* Mobile Search Bar */}
+                    <div className="md:hidden mb-6 relative">
+                        <FaMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                        <input
+                            type="text"
+                            placeholder="Buscar productos..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full bg-dark-surface border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors"
+                        />
+                    </div>
+
                     {/* Header for Shop Grid */}
-                    <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
-                        <h2 className="text-3xl font-black text-white italic uppercase">Todos los Productos <span className="text-primary text-xl ml-1">({pagination.total || 0})</span></h2>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-white/5 pb-6 gap-4">
+                        <div className="flex items-center justify-between w-full md:w-auto gap-4">
+                            <h2 className="text-xl sm:text-3xl font-black text-white italic uppercase">Productos <span className="text-primary text-base sm:text-xl ml-1">({pagination.total || 0})</span></h2>
+                            <button
+                                onClick={() => setIsMobileFiltersOpen(true)}
+                                className="md:hidden flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors whitespace-nowrap"
+                            >
+                                <FaFilter /> FILTROS
+                            </button>
+                        </div>
                         <div className="hidden md:flex items-center gap-2 text-gray-400 text-sm">
                             Mostrando <span className="text-white font-bold">{products.length}</span> resultados
                         </div>
