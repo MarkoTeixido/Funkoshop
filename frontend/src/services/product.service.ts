@@ -11,6 +11,11 @@ export const productService = {
         return response.data; // return data array
     },
 
+    getCategories: async (): Promise<{ licence_id: number, licence_name: string }[]> => {
+        const response = await api.get<{ licence_id: number, licence_name: string }[]>('/shop/categories');
+        return response.data;
+    },
+
     getById: async (id: number): Promise<{ product: Product, related: Product[] }> => {
         const response = await api.get<{ product: Product, related: Product[] }>(`/shop/item/${id}`);
         return response.data;

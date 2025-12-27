@@ -2,11 +2,18 @@ const shopService = require('../services/service_shop');
 const productService = require('../services/service_product');
 const orderService = require('../services/service_order');
 const cartService = require('../services/service_cart');
+const licenceService = require('../services/service_licence');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const { HTTP_CODES, MESSAGES } = require('../utils/constants');
 
 const shopControllers = {
+  // Get Categories (Licences)
+  getCategories: asyncHandler(async (req, res) => {
+    const categories = await licenceService.getAllLicence();
+    res.json(categories);
+  }),
+
   // Shop View (Filtering/Search)
   shopView: asyncHandler(async (req, res) => {
     const collections = await shopService.getShopProducts(req.query);

@@ -34,6 +34,7 @@ const checkoutValidation = [
 ];
 
 router.get('/', shopControllers.shopView);
+router.get('/categories', shopControllers.getCategories);
 router.get('/item/:id', shopControllers.idView);
 
 // Protected Routes

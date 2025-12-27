@@ -2,23 +2,26 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from "@/components/ProductCard";
 import ShopSidebar from '@/components/shop/ShopSidebar';
+import { productService } from '@/services/product.service';
+import { useSearchParams } from 'next/navigation';
 import { FaAngleLeft, FaAngleRight, FaFilter, FaXmark, FaMagnifyingGlass } from "react-icons/fa6";
 import { useProducts } from '@/hooks/useProducts';
 import Loader from '@/components/ui/Loader';
 
 export default function Shop() {
     const { products, pagination, loading, fetchProducts } = useProducts();
+    const searchParams = useSearchParams();
 
-    // Filters
+    // Filters - Initialize from URL Params to avoid race conditions
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState(searchParams.get('search') || "");
     const [sort, setSort] = useState("");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
     const [filterNew, setFilterNew] = useState(false);
     const [filterOffers, setFilterOffers] = useState(false);
     const [filterSpecial, setFilterSpecial] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || "");
     const [categories, setCategories] = useState<string[]>([]);
     const [page, setPage] = useState(1); // Pagination State
 
@@ -28,23 +31,32 @@ export default function Shop() {
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearch(search);
-            setPage(1); // Reset page on search
+            // Only reset page if search changed from what we initialized
+            if (search !== (searchParams.get('search') || "")) {
+                setPage(1);
+            }
         }, 500);
         return () => clearTimeout(handler);
-    }, [search]);
+    }, [search, searchParams]);
 
     // Extract categories on load if empty
+    // Extract categories on load
     useEffect(() => {
-        if (categories.length === 0 && products.length > 0) {
-            // Extract unique licences from products
-            const cats = Array.from(new Set(products
-                .map(p => p.Licence?.licence_name)
-                .filter((name): name is string => !!name)
-            )).sort();
+        const loadCategories = async () => {
+            try {
+                const cats = await productService.getCategories();
+                // Map to strings if your select expects strings, or keep objects
+                // Assuming ShopSidebar uses strings based on previous code:
+                setCategories(cats.map(c => c.licence_name).sort());
+            } catch (err) {
+                console.error("Failed to load categories", err);
+            }
+        };
 
-            if (cats.length > 0) setCategories(cats);
+        if (categories.length === 0) {
+            loadCategories();
         }
-    }, [products, categories.length]);
+    }, [categories.length]);
 
     useEffect(() => {
         const params: Record<string, string | number> = {
