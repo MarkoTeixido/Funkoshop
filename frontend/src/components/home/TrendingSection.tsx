@@ -13,7 +13,7 @@ export default function TrendingSection({ products }: TrendingSectionProps) {
             <div className="container-custom">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
                     <div>
-                        <h3 className="text-primary font-bold tracking-[0.2em] text-lg md:text-xl uppercase mb-1">Lanzamientos Exclusivos</h3>
+                        <p className="text-primary font-bold tracking-[0.2em] text-lg md:text-xl uppercase mb-1">Lanzamientos Exclusivos</p>
                         <h2 className="text-4xl md:text-6xl font-black text-white uppercase italic leading-[0.9]">Tendencias</h2>
                     </div>
                     <Link href="/shop" className="hidden md:flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
