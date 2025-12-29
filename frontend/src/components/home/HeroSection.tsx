@@ -18,7 +18,7 @@ export default function HeroSection() {
             />
             <div className="absolute inset-0 bg-gradient-to-b from-dark-bg/30 via-transparent to-dark-bg"></div>
 
-            <div className="container-custom relative z-10 flex flex-col items-start gap-6 sm:gap-8 px-6 sm:px-8 pt-8 sm:pt-0">
+            <div className="container-custom relative z-10 flex flex-col items-start gap-6 sm:gap-8 px-6 sm:px-8 pt-3 sm:pt-6">
                 <span className="bg-primary/20 border border-primary text-primary px-5 py-2 rounded-full text-sm sm:text-base font-bold tracking-widest uppercase backdrop-blur-sm animate-fade-in">
                     Nueva Colección
                 </span>

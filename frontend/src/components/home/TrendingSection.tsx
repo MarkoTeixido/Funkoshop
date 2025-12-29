@@ -7,6 +7,8 @@ interface TrendingSectionProps {
 }
 
 export default function TrendingSection({ products }: TrendingSectionProps) {
+    if (!products || products.length === 0) return null;
+
     return (
         <section className="py-20 bg-dark-bg relative">
             <div className="absolute -top-20 left-0 w-full h-32 bg-gradient-to-t from-dark-bg to-transparent z-10"></div>
