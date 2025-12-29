@@ -16,7 +16,7 @@ export default function TrendingSection({ products }: TrendingSectionProps) {
                         <p className="text-primary font-bold tracking-[0.2em] text-lg md:text-xl uppercase mb-1">Lanzamientos Exclusivos</p>
                         <h2 className="text-4xl md:text-6xl font-black text-white uppercase italic leading-[0.9]">Tendencias</h2>
                     </div>
-                    <Link href="/shop" className="hidden md:flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+                    <Link href="/shop" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
                         Ver Todo <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
                     </Link>
                 </div>
